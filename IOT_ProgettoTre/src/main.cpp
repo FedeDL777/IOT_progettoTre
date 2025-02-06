@@ -1,56 +1,63 @@
 #include <Arduino.h>
 
 /*
- * Second example, about tasks that can be run
- * thanks to FreeRTOS support.  
- *
- */
- 
+/*
+  Example from WiFi > WiFiScan
+  Complete details at https://RandomNerdTutorials.com/esp32-useful-wi-fi-functions-arduino/
+*/
 
-TaskHandle_t Task1;
-TaskHandle_t Task2;
+#include <WiFi.h>
+#include <HTTPClient.h>
 
-const int led_1 = 4;
-const int led_2 = 5;
+const char* ssid = "LittleBarfly";
+const char* password = "esiot-2024-2025";
+
+const char *serverPath = "http://www.google.it";
+
+void connectToWifi(const char* ssid, const char* password){
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting");
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to WiFi network with IP Address: ");
+  Serial.println(WiFi.localIP());
+}
 
 void setup() {
   Serial.begin(115200); 
-  pinMode(led_1, OUTPUT);
-  pinMode(led_2, OUTPUT);
-
-  xTaskCreatePinnedToCore(Task1code,"Task1",10000,NULL,1,&Task1,0);                         
-  delay(500); 
-
-  xTaskCreatePinnedToCore(Task2code,"Task2",10000,NULL,1,&Task2,1);          
-  delay(500); 
-}
-
-void Task1code(void* parameter){
-  Serial.print("Task1 is running on core ");
-  Serial.println(xPortGetCoreID());
-
-  for(;;){
-    digitalWrite(led_1, HIGH);
-    delay(500);
-    digitalWrite(led_1, LOW);
-    delay(500);
-  } 
-}
-
-void Task2code(void* parameter){
-  Serial.print("Task2 is running on core ");
-  Serial.println(xPortGetCoreID());
-
-  for(;;){
-    digitalWrite(led_2, HIGH);
-    delay(1000);
-    digitalWrite(led_2, LOW);
-    delay(1000);
-  }
+  connectToWifi(ssid, password);
 }
 
 void loop() {
-  Serial.print("this is the main loop running on core ");
-  Serial.println(xPortGetCoreID());
-  delay(10000);
-}
+  if(WiFi.status()== WL_CONNECTED){      
+    HTTPClient http;
+  
+    // Your Domain name with URL path or IP address with path
+    http.begin(serverPath);
+      
+    // Send HTTP GET request
+    int httpResponseCode = http.GET();
+      
+    if (httpResponseCode > 0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      String payload = http.getString();
+      Serial.println(payload);
+    } else {
+      Serial.print("Error code: ");
+      Serial.println(httpResponseCode);
+    }
+    
+    // Free resources
+    http.end();
+
+    delay(2000);
+
+  } else {
+    Serial.println("WiFi Disconnected... Reconnect.");
+    connectToWifi(ssid, password);
+  }
+}  
