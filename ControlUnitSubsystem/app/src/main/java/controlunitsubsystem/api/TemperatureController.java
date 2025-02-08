@@ -1,5 +1,7 @@
 package controlunitsubsystem.api;
 
+import java.util.List;
+
 public interface TemperatureController {
 
     void setTemperature(double temperature);
@@ -16,4 +18,5 @@ public interface TemperatureController {
 
     void freeData();
 
+    List<Double> getLastNTemperatures(int n);
 }

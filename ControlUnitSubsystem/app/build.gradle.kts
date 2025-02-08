@@ -23,6 +23,8 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    implementation("io.github.java-native:jssc:2.9.6")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

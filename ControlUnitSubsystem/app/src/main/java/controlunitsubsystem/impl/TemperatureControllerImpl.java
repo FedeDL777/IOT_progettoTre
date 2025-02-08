@@ -4,20 +4,22 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.util.concurrent.AtomicDouble;
+
 import controlunitsubsystem.api.Period;
 import controlunitsubsystem.api.TemperatureController;
 
 public class TemperatureControllerImpl implements TemperatureController {
 
-    private double lastTemperature;
-    private double maxTemperature;
-    private double minTemperature;
+    private AtomicDouble lastTemperature;
+    private AtomicDouble maxTemperature;
+    private AtomicDouble minTemperature;
     private List<TempEntry> temperatures;
     private Period period;
 
     public TemperatureControllerImpl() {
-        maxTemperature = Double.MIN_VALUE;
-        minTemperature = Double.MAX_VALUE;
+        maxTemperature = new AtomicDouble(Double.MIN_VALUE);
+        minTemperature = new AtomicDouble(Double.MAX_VALUE);
         temperatures = new LinkedList<>();
         period = Period.DAY;
     }
@@ -25,12 +27,12 @@ public class TemperatureControllerImpl implements TemperatureController {
     @Override
     public void setTemperature(double temperature) {
         temperatures.add(new TempEntry(temperature, LocalDateTime.now()));
-        lastTemperature = temperature;
-        if (temperature > maxTemperature) {
-            maxTemperature = temperature;
+        lastTemperature.set(temperature);
+        if (temperature >= maxTemperature.get()) {
+            maxTemperature.set(temperature);
         }
-        if (temperature < minTemperature) {
-            minTemperature = temperature;
+        if (temperature <= minTemperature.get()) {
+            minTemperature.set(temperature);
         }
     }
 
@@ -79,24 +81,33 @@ public class TemperatureControllerImpl implements TemperatureController {
 
     @Override
     public double getMaximumTemperature() {
-        return maxTemperature;
+        return maxTemperature.get();
     }
 
     @Override
     public double getMinimumTemperature() {
-        return minTemperature;
+        return minTemperature.get();
     }
 
     @Override
     public double getTemperature() {
-        return lastTemperature;
+        return lastTemperature.get();
     }
 
     @Override
     public void freeData() {
-        while(temperatures.getFirst().getTimestamp().isBefore(LocalDateTime.now().minusDays(1))) {
+        while (temperatures.getFirst().getTimestamp().isBefore(LocalDateTime.now().minusDays(1))) {
             temperatures.removeFirst();
         }
+    }
+
+    @Override
+    public List<Double> getLastNTemperatures(int n) {
+        List<Double> lastNTemps = new LinkedList<>();
+        for (int i = temperatures.size() - 1; i >= 0 && n > 0; i--, n--) {
+            lastNTemps.addFirst(temperatures.get(i).getTemperature());
+        }
+        return lastNTemps;
     }
 
     private class TempEntry {
@@ -121,4 +132,5 @@ public class TemperatureControllerImpl implements TemperatureController {
             return "Temp: " + temperature + "°C, Ora: " + insertTime;
         }
     }
+
 }
