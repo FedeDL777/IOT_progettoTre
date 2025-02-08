@@ -1,23 +1,24 @@
-#include <Arduino.h>
-
 /*
-/*
-  Example from WiFi > WiFiScan
-  Complete details at https://RandomNerdTutorials.com/esp32-useful-wi-fi-functions-arduino/
-*/
-
+ * HTTPClient lib --  Performing an HTTP POST to our REST service
+ *
+ * Remark:
+ * - Going through ngrok
+ *
+ */
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-const char* ssid = "LittleBarfly";
-const char* password = "esiot-2024-2025";
+const char *ssid = "Home&Life SuperWiFi-6985";
+const char *password = "Tamburini78";
 
-const char *serverPath = "http://www.google.it";
+const char *serviceURI = "http://localhost:8080";
 
-void connectToWifi(const char* ssid, const char* password){
+void connectToWifi(const char *ssid, const char *password)
+{
   WiFi.begin(ssid, password);
   Serial.println("Connecting");
-  while(WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -26,38 +27,50 @@ void connectToWifi(const char* ssid, const char* password){
   Serial.println(WiFi.localIP());
 }
 
-void setup() {
-  Serial.begin(115200); 
+void setup()
+{
+  Serial.begin(115200);
   connectToWifi(ssid, password);
 }
 
-void loop() {
-  if(WiFi.status()== WL_CONNECTED){      
-    HTTPClient http;
-  
-    // Your Domain name with URL path or IP address with path
-    http.begin(serverPath);
-      
-    // Send HTTP GET request
-    int httpResponseCode = http.GET();
-      
-    if (httpResponseCode > 0) {
-      Serial.print("HTTP Response code: ");
-      Serial.println(httpResponseCode);
-      String payload = http.getString();
-      Serial.println(payload);
-    } else {
-      Serial.print("Error code: ");
-      Serial.println(httpResponseCode);
+int sendData(String address, float value, String place)
+{
+
+  HTTPClient http;
+  http.begin(address + "/api/data");
+  http.addHeader("Content-Type", "application/json");
+
+  String msg =
+      String("{ \"value\": ") + String(value) +
+      ", \"place\": \"" + place + "\" }";
+
+  int retCode = http.POST(msg);
+  http.end();
+
+  return retCode;
+}
+
+void loop()
+{
+  if (WiFi.status() == WL_CONNECTED)
+  {
+
+    int value = random(15, 20);
+    int code = sendData(serviceURI, value, "lab_2_2");
+    if (code == 200)
+    {
+      Serial.println("ok");
     }
-    
-    // Free resources
-    http.end();
+    else
+    {
+      Serial.println(String("error: ") + code);
+    }
 
-    delay(2000);
-
-  } else {
+    delay(5000);
+  }
+  else
+  {
     Serial.println("WiFi Disconnected... Reconnect.");
     connectToWifi(ssid, password);
   }
-}  
+}
