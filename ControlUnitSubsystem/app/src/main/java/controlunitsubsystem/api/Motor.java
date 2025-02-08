@@ -1,6 +1,6 @@
 package controlunitsubsystem.api;
 
-public interface MotorController {
+public interface Motor {
 
     void sendMotorAngle(int angle);
 

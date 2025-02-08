@@ -10,7 +10,7 @@ public interface ControlUnit {
         MANUAL,
     }
 
-    void getTemperature();
+    double getTemperature();
 
     void sendTemperatureData();
 
@@ -22,4 +22,5 @@ public interface ControlUnit {
 
     void solveAlarm();
     
+    void tick();
 }

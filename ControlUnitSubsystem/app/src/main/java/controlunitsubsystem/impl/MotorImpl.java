@@ -1,14 +1,14 @@
 package controlunitsubsystem.impl;
 
 import controlunitsubsystem.api.CommChannel;
-import controlunitsubsystem.api.MotorController;
+import controlunitsubsystem.api.Motor;
 
-public class MotorControllerImpl implements MotorController {
+public class MotorImpl implements Motor {
 
     private int angle;
     private CommChannel motorChannel;
 
-    public MotorControllerImpl(CommChannel motorChannel) {
+    public MotorImpl(CommChannel motorChannel) {
         this.motorChannel = motorChannel;
     }
 
