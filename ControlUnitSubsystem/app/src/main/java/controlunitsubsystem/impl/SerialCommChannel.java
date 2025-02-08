@@ -47,13 +47,11 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 
     @Override
     public String receiveMsg() throws InterruptedException {
-        // TODO Auto-generated method stub
         return queue.take();
     }
 
     @Override
     public boolean isMsgAvailable() {
-        // TODO Auto-generated method stub
         return !queue.isEmpty();
     }
 

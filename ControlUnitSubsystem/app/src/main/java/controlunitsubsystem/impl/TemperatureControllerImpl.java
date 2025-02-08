@@ -94,9 +94,18 @@ public class TemperatureControllerImpl implements TemperatureController {
 
     @Override
     public void freeData() {
-        while(temperatures.getFirst().getTimestamp().isBefore(LocalDateTime.now().minusDays(1))) {
+        while (temperatures.getFirst().getTimestamp().isBefore(LocalDateTime.now().minusDays(1))) {
             temperatures.removeFirst();
         }
+    }
+
+    @Override
+    public List<Double> getLastNTemperatures(int n) {
+        List<Double> lastNTemps = new LinkedList<>();
+        for (int i = temperatures.size() - 1; i >= 0 && n > 0; i--, n--) {
+            lastNTemps.addFirst(temperatures.get(i).getTemperature());
+        }
+        return lastNTemps;
     }
 
     private class TempEntry {
@@ -121,4 +130,5 @@ public class TemperatureControllerImpl implements TemperatureController {
             return "Temp: " + temperature + "°C, Ora: " + insertTime;
         }
     }
+
 }
