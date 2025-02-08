@@ -2,18 +2,21 @@
 #define __LCD__
 #include <LiquidCrystal_I2C.h>
 #include "set_up.h"
-class LCD{
-    public:
+class LCD
+{
+public:
     LCD();
     void setup();
 
     void turnOff();
     void turnOn();
-    void displayManual();
-    void displayNormal();
-    private:
-        LiquidCrystal_I2C* pLcd; 
-        void initCursor();
+    void displayManual(int t, int d);
+    void displayNormal(int t);
+
+private:
+    int mapOpening(int d);
+    LiquidCrystal_I2C *pLcd;
+    void initCursor();
 };
 
 #endif

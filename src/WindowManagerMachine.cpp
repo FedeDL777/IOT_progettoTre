@@ -1,53 +1,60 @@
 #include "WindowManagerMachine.h"
 #include "include/set_up.h"
 
-WMMSystem::WMMSystem(){
+WMMSystem* instance;  // Variabile globale per l'istanza
+
+WMMSystem::WMMSystem() : state(NORMAL) {
+    instance = this;  // Salviamo il riferimento all'istanza
 }
 
-void WMMSystem::init()
-{
-    //inizializzazione LCD
-    this->userConsole = new LCD();
+void WMMSystem::switchState() {
+    if (state == MANUAL)
+        state = NORMAL;
+    else
+        state = MANUAL;
+}
 
-    // Inizializzazione del servo motore
+// Wrapper per chiamare switchState() dall'interrupt
+void switchStateWrapper() {
+    if (instance) {
+        instance->switchState();
+    }
+}
+
+void WMMSystem::init() {
+    this->userConsole = new LCD();
     this->window = new MotorImpl(SERVO_MOTOR);
 
-    //Inizializzazione bottone
-    //TODO
+    attachInterrupt(digitalPinToInterrupt(BUTTON_SWITCH_MANUAL), switchStateWrapper, RISING);
 
     this->userConsole->turnOff();
     this->userConsole->setup();
     this->userConsole->turnOn();
     state = NORMAL;
-
+    this->temperature = 20;
+    this->openDegreeServo = 0;
 }
 
-void WMMSystem::manual()
-{
+bool WMMSystem::isManual() {
+    return state == MANUAL;
 }
 
-void WMMSystem::normal()
-{
-}
-
-bool WMMSystem::isManual()
-{
-    return false;
-}
-
-bool WMMSystem::isNormal()
-{
-    return false;
+bool WMMSystem::isNormal() {
+    return state == NORMAL;
 }
 
 void WMMSystem::fullyOpenServo()
 {
+    this->Servo->fullyOpen();
+    
 }
 
 void WMMSystem::closeServo()
 {
+    this->Servo->close();
 }
 
 void WMMSystem::openServo(int degree)
 {
+    this->Servo->openDegree(degree);
 }

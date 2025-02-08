@@ -26,17 +26,27 @@ void LCD::turnOn()
     pLcd->display();
   pLcd->clear();
 }
-void LCD::displayManual()
+void LCD::displayManual(int t, int d)
 {
     this->turnOn();
     this->initCursor();
-    pLcd->print("MANUAL");
+    pLcd->print("MANUAL degree: ");
+    pLcd->print(mapOpening(d));
+    pLcd->print("%");
+    pLcd->setCursor(1,2);
+    pLcd->print("Temperature: ");
+    pLcd->print(t);
+
+
 }
-void LCD::displayNormal()
+void LCD::displayNormal(int t)
 {
     this->turnOn();
     this->initCursor();
-    pLcd->print("NORMAL");
+    pLcd->print("Automatic");
+    pLcd->setCursor(1,2);
+    pLcd->print("Temperature: ");
+    pLcd->print(t);
 }
 
 void LCD::turnOff()
@@ -50,4 +60,8 @@ void LCD::initCursor()
     pLcd->clear();
     pLcd->setCursor(1, 0); 
 }
-
+int LCD::mapOpening(int d){
+    d *= 1.11;
+    d += 0.1;
+    return d;
+}

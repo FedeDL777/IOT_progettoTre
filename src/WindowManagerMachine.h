@@ -6,38 +6,37 @@
 #include "include/Led.h"
 #include "include/MotorImpl.h"
 #include "include/LCD.h"
-//#include "include/ServoMotor.h"
+#define OPEN 90
+#define CLOSE 0
 
-
-class WMMSystem {
+class WMMSystem
+{
 public:
     WMMSystem();
     void init();
-    
-    void manual();
-    void normal();
+
+    void switchState();
     bool isManual();
     bool isNormal();
-
-
 
     void fullyOpenServo();
     void closeServo();
     void openServo(int degree);
 
-    
-    private:
-        int openDegreeServo;
-        
+private:
+    int openDegreeServo;
+    int temperature;
 
-        enum{
-            MANUAL, NORMAL, ERROR
+    enum
+    {
+        MANUAL,
+        NORMAL
 
-        } state;
-    Button* manualButton;
-    Motor* window;
-    LCD* userConsole;
+    } state;
+    Button *manualButton;
+    Motor *window;
+    LCD *userConsole;
+    MotorImpl* Servo;
 };
-
 
 #endif
