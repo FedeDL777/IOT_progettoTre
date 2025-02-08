@@ -8,3 +8,5 @@ settings.json
 .gradle
 
 build
+
+bin
