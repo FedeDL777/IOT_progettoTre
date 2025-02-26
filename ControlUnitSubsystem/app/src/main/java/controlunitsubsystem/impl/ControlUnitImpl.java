@@ -10,7 +10,9 @@ public class ControlUnitImpl implements ControlUnit {
     private final TemperatureController temperatureController;
     private Status status;
     private final CommChannel serialChannel;
+    private final CommChannel espChannel;
     private final ControllerStatesTask controllerStatesTask;
+    private final TemperatureTask temperatureTask;
 
 
     private final int P1 = 200;
@@ -28,18 +30,12 @@ public class ControlUnitImpl implements ControlUnit {
         this.temperatureController = new TemperatureControllerImpl();
         controllerStatesTask = new ControllerStatesTask(this, P1);
         this.status = Status.NORMAL;
+        controllerStatesTask.start();
     }
 
     @Override
-    public double getTemperature() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTemperature'");
-    }
-
-    @Override
-    public void sendTemperatureData() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sendTemperatureData'");
+    public void setTemperature(double temperature) {
+        temperatureController.setTemperature(temperature);
     }
 
     @Override
@@ -76,7 +72,7 @@ public class ControlUnitImpl implements ControlUnit {
         if(temperature<=T1) {
             status = Status.NORMAL;
             controllerStatesTask.changePeriod(P1);
-            motorController.sendMotorAngle(MIN_ANGLE);
+            motorController.sendMotorAngle(MIN_ANGLE);//this is blocking must create an executor
         } else if(temperature<=T2) {
             status = Status.HOT;
             controllerStatesTask.changePeriod(P2);

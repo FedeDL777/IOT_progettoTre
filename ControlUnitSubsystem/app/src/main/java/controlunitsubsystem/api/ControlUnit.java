@@ -10,9 +10,7 @@ public interface ControlUnit {
         MANUAL,
     }
 
-    double getTemperature();
-
-    void sendTemperatureData();
+    void setTemperature(double temperature);
 
     void sendStatus();
 
