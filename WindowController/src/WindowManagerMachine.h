@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "include/Button.h"
-#include "include/MotorImpl.h"
+#include "include/ServoMotor.h"
 #include "include/LCD.h"
 #include "include/Pot.h"
 #define OPEN 90
@@ -44,9 +44,8 @@ private:
 
     } state;
     Button *manualButton;
-    Motor *window;
+    ServoMotor *window;
     LCD *userConsole;
-    MotorImpl *Servo;
     Pot *manualSignal;
 };
 

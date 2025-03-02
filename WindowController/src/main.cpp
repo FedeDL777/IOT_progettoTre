@@ -11,9 +11,11 @@ Scheduler *sched;
 void setup()
 {
   MsgService.init();
+  sched->init(100);
+
   machine = new WMMSystem();
   machine->init();
-  sched = new Scheduler();
+
   Task *servoTask = new ServoTask(machine);
   servoTask->init(100);
   sched->addTask(servoTask);
@@ -21,7 +23,5 @@ void setup()
 
 void loop()
 {
-  machine->fullyOpenServo();
-  Serial.println(machine->isManual());
   sched->schedule();
 }

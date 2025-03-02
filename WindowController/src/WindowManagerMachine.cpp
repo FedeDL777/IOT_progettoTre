@@ -28,7 +28,7 @@ void switchStateWrapper()
 void WMMSystem::init()
 {
     this->userConsole = new LCD();
-    this->window = new MotorImpl(SERVO_MOTOR);
+    this->window = new ServoMotor(SERVO_MOTOR);
     this->manualSignal = new Pot(POTENTIOMETER);
     attachInterrupt(digitalPinToInterrupt(BUTTON_SWITCH_MANUAL), switchStateWrapper, RISING);
 
@@ -74,17 +74,17 @@ bool WMMSystem::isNormal()
 
 void WMMSystem::fullyOpenServo()
 {
-    this->Servo->fullyOpen();
+    this->window->fullyOpen();
 }
 
 void WMMSystem::closeServo()
 {
-    this->Servo->close();
+    this->window->close();
 }
 
 void WMMSystem::openServo(int degree)
 {
-    this->Servo->openDegree(degree);
+    this->window->openDegree(degree);
 }
 
 void WMMSystem::openManualServo()
