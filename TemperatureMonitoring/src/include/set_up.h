@@ -1,14 +1,16 @@
-#ifndef __SETUP__
-#define __SETUP__
+#ifndef CONFIG_H
+#define CONFIG_H
 
-#define BUTTON_SWITCH_MANUAL 2
-#define SERVO_MOTOR 6
+#include <Arduino.h>
+/* Hardware configs */
+#define LED_RED_PIN 32
+#define LED_GREEN_PIN 33
+#define TEMPERATURE_SENSOR_PIN 35
 
-// PIN PER l'esp32
-#define GREEN_LED
-#define RED_LED
-#define TEMP_
-
-#define POTENTIOMETER A0
+/* Network */
+#define WIFI_SSID "*"
+#define WIFI_PASSWORD "ciao"
+#define MQTT_SERVER "broker.mqtt-dashboard.com" //
+#define TOPIC "IOT-Progetto-03"
 
 #endif
