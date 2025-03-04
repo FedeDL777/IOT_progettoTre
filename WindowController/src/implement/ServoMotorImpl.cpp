@@ -1,7 +1,8 @@
 #include "../include/ServoMotor.h"
 #include "Arduino.h"
 #include "../include/ServoTimer2.h"
-
+#define MIN_DEGREE 0
+#define MAX_DEGREE 90
 ServoMotor::ServoMotor(int pin){
   this->pin = pin;  
 } 
@@ -12,10 +13,10 @@ void ServoMotor::on(){
 }
 
 void ServoMotor::openDegree(int angle){
-	if (angle > 180){
-		angle = 180;
-	} else if (angle < 0){
-		angle = 0;
+	if (angle > MAX_DEGREE){
+		angle = MAX_DEGREE;
+	} else if (angle < MIN_DEGREE){
+		angle = MIN_DEGREE;
 	}
   // 750 -> 0, 2250 -> 180 
   // 750 + angle*(2250-750)/180

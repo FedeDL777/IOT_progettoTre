@@ -7,21 +7,20 @@
 #include "kernel/MsgService.h"
 
 WMMSystem *machine;
-Scheduler *sched;
+Scheduler sched;
 void setup()
 {
   MsgService.init();
-  sched->init(100);
+  sched.init(100);
 
   machine = new WMMSystem();
-  machine->init();
 
   Task *servoTask = new ServoTask(machine);
   servoTask->init(100);
-  sched->addTask(servoTask);
+  sched.addTask(servoTask);
 }
 
 void loop()
 {
-  sched->schedule();
+  sched.schedule();
 }

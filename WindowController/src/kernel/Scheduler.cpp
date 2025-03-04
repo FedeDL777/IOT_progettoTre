@@ -10,6 +10,7 @@ void timerHandler(void)
 
 void Scheduler::init(int basePeriod)
 {
+  Serial.println("SCHEDULER INIT");
   this->basePeriod = basePeriod;
   timerFlag = false;
   long period = 1000l * basePeriod;

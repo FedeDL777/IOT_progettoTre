@@ -13,7 +13,6 @@ class WMMSystem
 {
 public:
     WMMSystem();
-    void init();
 
     void setManual();
     void setTemperature(int temperature);
@@ -28,6 +27,7 @@ public:
     void openServo(int degree);
     void openManualServo();
     int getServoDegree();
+    bool buttonPressed();
 
     void showAutomatic();
     void showManual();

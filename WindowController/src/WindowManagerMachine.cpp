@@ -1,60 +1,31 @@
 #include "WindowManagerMachine.h"
 #include "include/set_up.h"
 
-WMMSystem *instance; // Variabile globale per l'istanza
-
-WMMSystem::WMMSystem() : state(NORMAL)
-{
-    instance = this; // Salviamo il riferimento all'istanza
-}
-
-void WMMSystem::switchState()
-{
-    if (state == MANUAL)
-        state = NORMAL;
-    else
-        state = MANUAL;
-}
-
-// Wrapper per chiamare switchState() dall'interrupt
-void switchStateWrapper()
-{
-    if (instance)
-    {
-        instance->switchState();
-    }
-}
-
-void WMMSystem::init()
+WMMSystem::WMMSystem()
 {
     this->userConsole = new LCD();
     this->window = new ServoMotor(SERVO_MOTOR);
     this->manualSignal = new Pot(POTENTIOMETER);
-    attachInterrupt(digitalPinToInterrupt(BUTTON_SWITCH_MANUAL), switchStateWrapper, RISING);
+    this->manualButton = new Button(BUTTON_SWITCH_MANUAL);
 
     this->userConsole->turnOff();
     this->userConsole->setup();
     this->userConsole->turnOn();
-    state = MANUAL; // cambia
 
-    this->temperature = 20;
-    this->openDegreeServo = 0;
-    //this->userConsole->displayAutomatic(temperature, openDegreeServo);
+    state = MANUAL; // Imposta lo stato iniziale corretto
+
+    temperature = 20;
+    openDegreeServo = 0;
+}
+
+void WMMSystem::switchState()
+{
+    state = (state == MANUAL) ? NORMAL : MANUAL;
 }
 
 void WMMSystem::setManual()
 {
     this->state = MANUAL;
-}
-
-void WMMSystem::setTemperature(int temperature)
-{
-    this->temperature = temperature;
-}
-
-void WMMSystem::setDegreeServo(int degree)
-{
-    this->openDegreeServo = degree;
 }
 
 void WMMSystem::setNormal()
@@ -70,6 +41,16 @@ bool WMMSystem::isManual()
 bool WMMSystem::isNormal()
 {
     return state == NORMAL;
+}
+
+void WMMSystem::setTemperature(int temperature)
+{
+    this->temperature = temperature;
+}
+
+void WMMSystem::setDegreeServo(int degree)
+{
+    this->openDegreeServo = degree;
 }
 
 void WMMSystem::fullyOpenServo()
@@ -98,6 +79,12 @@ void WMMSystem::openManualServo()
 int WMMSystem::getServoDegree()
 {
     return this->openDegreeServo;
+}
+
+bool WMMSystem::buttonPressed()
+{
+    this->manualButton->sync();
+    return this->manualButton->isPressed();
 }
 
 void WMMSystem::showAutomatic()

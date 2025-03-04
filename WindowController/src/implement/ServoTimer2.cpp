@@ -1,3 +1,6 @@
+
+#include <Arduino.h>
+#include "../include/ServoTimer2.h"
 extern "C"
 {
 // AVR LibC Includes
@@ -5,8 +8,7 @@ extern "C"
 #include <avr/interrupt.h>
 	// #include "WConstants.h"
 }
-#include <Arduino.h>
-#include "../include/ServoTimer2.h"
+
 static void initISR();
 static void writeChan(uint8_t chan, int pulsewidth);
 

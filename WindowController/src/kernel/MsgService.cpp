@@ -28,11 +28,12 @@ Msg *MsgServiceClass::receiveMsg()
 
 void MsgServiceClass::init()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   content.reserve(256);
   content = "";
   currentMsg = NULL;
   msgAvailable = false;
+  Serial.println("Msg");
 }
 
 void MsgServiceClass::sendMsg(const String &msg)

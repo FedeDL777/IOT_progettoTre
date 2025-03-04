@@ -1,6 +1,6 @@
 #include "../include/Pot.h"
 #define MIN_DEGREE 0
-#define MAX_DEGREE 180
+#define MAX_DEGREE 90
 Pot::Pot(int pin)
 {
     this->pin = pin;
@@ -10,7 +10,7 @@ Pot::Pot(int pin)
 int Pot::getDegree()
 {
     readValue();
-    return 0;
+    return this->degree;
 }
 double Pot::myMap(double x, double in_min, double in_max, double out_min, double out_max)
 {
