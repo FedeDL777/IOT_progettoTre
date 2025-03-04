@@ -1,83 +1,65 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include "MQTTConnection.h"
-#include <HTTPClient.h>
 
 MQTTConnection::MQTTConnection(const char *ssid, const char *password, const char *mqtt_server, const char *topic)
-{
-}
+    : ssid(ssid), password(password), mqtt_server(mqtt_server), topic(topic), client(espClient) {}
 
-void MQTTConnection::setup() {
-    delay(10);
+void MQTTConnection::connectWiFi() {
     Serial.println(String("Connecting to ") + ssid);
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
+    
+    unsigned long startAttemptTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 20000) { 
+        delay(500);
+        Serial.print(".");
     }
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("\nWiFi connected, IP: " + WiFi.localIP().toString());
+    } else {
+        Serial.println("\nWiFi connection failed!");
+    }
 }
 
-void MQTTConnection::reconnect() {
+void MQTTConnection::connectMQTT() {
     while (!client.connected()) {
-        Serial.print("Connessione a MQTT...");
-        if (client.connect("ESP32_Client")) {
-            Serial.println("Connesso!");
+        Serial.print("Attempting MQTT connection... ");
+        String clientId = String("IOT-Progetto-03-client-") + String(random(0xFFFF), HEX);
+        
+        if (client.connect(clientId.c_str())) {
+            Serial.println("Connected!");
+            client.subscribe(topic);
         } else {
-            Serial.print("Fallito, rc=");
+            Serial.print("Failed, rc=");
             Serial.print(client.state());
-            Serial.println(" Riprovo tra 5 secondi...");
+            Serial.println(" retrying in 5s...");
             delay(5000);
         }
     }
 }
 
-bool MQTTConnection::publish(const char *message)
-{        
-       return this->client.publish(topic, message);
-     
+void MQTTConnection::setup() {
+    connectWiFi();
+    client.setServer(mqtt_server, 1883);
+    connectMQTT();
 }
 
 void MQTTConnection::loop() {
     if (!client.connected()) {
-        reconnect();
+        connectMQTT();
     }
-    this->client.loop();
+    client.loop();
+}
+
+bool MQTTConnection::publish(const char *message) {
+    if (client.connected()) {
+        return client.publish(topic, message);
+    }
+    return false;
 }
 
 void MQTTConnection::callback(char* topic, byte* payload, unsigned int length) {
-    Serial.println(String("Message arrived on [") + topic + "] len: " + length );
-  }
-
-
-
-void MQTTConnection::reconnect() {
-  
-    // Loop until we're reconnected
-    
-    while (!client.connected()) {
-      Serial.print("Attempting MQTT connection...");
-      
-      // Create a random client ID
-      String clientId = String("IOT-Progetto-03-client")+String(random(0xffff), HEX);
-  
-      // Attempt to connect
-      if (client.connect(clientId.c_str())) {
-        Serial.println("connected");
-        // Once connected, publish an announcement...
-        // client.publish("outTopic", "hello world");
-        // ... and resubscribe
-        client.subscribe(topic);
-      } else {
-        Serial.print("failed, rc=");
-        Serial.print(client.state());
-        Serial.println(" try again in 5 seconds");
-        // Wait 5 seconds before retrying
-        delay(5000);
-      }
-    }
-  }
+    Serial.println(String("Message arrived on [") + topic + "] len: " + length);
+}
