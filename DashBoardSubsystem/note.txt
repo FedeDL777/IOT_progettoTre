@@ -1,0 +1,3 @@
+La dashboard non puo facilmente decidere lo stato
+
+lo stato deve dunque essere mandato alla dashboard come stringa
