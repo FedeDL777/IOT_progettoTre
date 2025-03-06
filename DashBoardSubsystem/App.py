@@ -17,4 +17,4 @@ if __name__ == '__main__':
     flask_thread.start()
 
     # Avvia la GUI Tkinter
-    app.root.mainloop()
+    app.mainloop()

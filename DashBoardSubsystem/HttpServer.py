@@ -13,11 +13,14 @@ class HttpServer:
         # Riceve il messaggio e lo converte in un tipo float
         status = request.json["status"]
         temperature = float(request.json["temperature"])
-        print(f"Received message: {status} - {temperature}")
+        level = int(request.json["level"])
+        print(f"Received message: {status} - {temperature} - {level}")
         # Chiamata alla funzione della dashboard per aggiornare la temperatura
+        self.dashboardApp.update_level(level)
+        self.dashboardApp.update_state(status)
         self.dashboardApp.update_temperature(temperature)
         # Restituisce lo stato dell'allarme
-        return jsonify({"status": self.dashboardApp.alarmState()})
+        return jsonify({"alarm": self.dashboardApp.alarmState(), "window_level": self.dashboardApp.get_window_level()})
 
     def ping(self):
         return jsonify({"message": "Server attivo!"})
