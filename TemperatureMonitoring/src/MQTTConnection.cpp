@@ -59,11 +59,20 @@ void MQTTConnection::setup()
 
 void MQTTConnection::loop()
 {
-    if (!client.connected())
-    {
-        connectMQTT();
-    }
     client.loop();
+}
+
+void MQTTConnection::reconnect()
+{
+        if (!client.connected())
+        {
+            connectMQTT();
+        }
+}
+
+bool MQTTConnection::isConnected()
+{
+    return this->client.connected();
 }
 
 bool MQTTConnection::publish(const char *message)

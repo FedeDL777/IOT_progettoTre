@@ -14,7 +14,7 @@
 
 enum State
 {
-    NOT_COTTECTED,
+    NOT_CONNECTED,
     CONNECTED
 } state;
 
@@ -25,8 +25,47 @@ void setup()
     Serial.begin(115200);
     machine = new TMMSystem();
     mqttConnection.setup();
+    state = CONNECTED;
 }
 
 void loop()
 {
+    if (state == CONNECTED)
+    {
+        if (!mqttConnection.isConnected())
+        {
+            machine->problem();
+            state = NOT_CONNECTED;
+        }
+        else
+        {
+            mqttConnection.loop();
+            float temperature = machine->getTemperature();
+            if (temperature < 20)
+            {
+                machine->normal();
+            }
+            else
+            {
+                machine->problem();
+            }
+    
+            if (mqttConnection.publish(String(temperature).c_str()))
+            {
+                Serial.println("Message sent!");
+            }
+            else
+            {
+                Serial.println("Error sending message!");
+            }
+        }
+        
+
+    }
+    else
+    {
+        Serial.println("Not connected!");
+    }
+
+    
 }

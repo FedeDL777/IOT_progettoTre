@@ -22,6 +22,8 @@ public:
 
     void setup();
     void loop();
+    void reconnect();
+    bool isConnected();
     bool publish(const char *message);
     void callback(char *topic, byte *payload, unsigned int length);
 };
