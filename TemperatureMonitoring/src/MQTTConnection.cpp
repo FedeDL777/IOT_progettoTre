@@ -5,6 +5,11 @@
 MQTTConnection::MQTTConnection(const char *ssid, const char *password, const char *mqtt_server, const char *topic)
     : ssid(ssid), password(password), mqtt_server(mqtt_server), topic(topic), client(espClient) {}
 
+int MQTTConnection::getSamplingTime()
+{
+    return this->samplingTime;
+}
+
 void MQTTConnection::connectWiFi()
 {
     Serial.println(String("Connecting to ") + ssid);
@@ -39,6 +44,7 @@ void MQTTConnection::connectMQTT()
         {
             Serial.println("Connected!");
             client.subscribe(topic);
+            client.setCallback(std::bind(&MQTTConnection::callback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         }
         else
         {
@@ -64,10 +70,10 @@ void MQTTConnection::loop()
 
 void MQTTConnection::reconnect()
 {
-        if (!client.connected())
-        {
-            connectMQTT();
-        }
+    if (!client.connected())
+    {
+        connectMQTT();
+    }
 }
 
 bool MQTTConnection::isConnected()
@@ -86,5 +92,27 @@ bool MQTTConnection::publish(const char *message)
 
 void MQTTConnection::callback(char *topic, byte *payload, unsigned int length)
 {
-    Serial.println(String("Message arrived on [") + topic + "] len: " + length);
+    // Assicuriamoci che il payload sia una stringa terminata con null
+    char message[length + 1];
+    memcpy(message, payload, length);
+    message[length] = '\0';
+
+    Serial.println(String("Message arrived on [") + topic + "] len: " + length + ", message: " + String(message));
+
+    // Controlliamo se il messaggio inizia con "cu:"
+    if (strncmp(message, "cu:", 3) == 0)
+    {
+        String content = String(message).substring(3);
+        
+        // Verifica che il contenuto sia un numero
+        if (content.length() > 0 && content.toInt() > 0)
+        {
+            this->samplingTime = content.toInt();
+            Serial.println("Sampling period changed to: " + String(this->samplingTime));
+        }
+        else
+        {
+            Serial.println("Invalid sampling period received: " + content);
+        }
+    }
 }

@@ -13,13 +13,13 @@ private:
     const char *password;
     const char *mqtt_server;
     const char *topic;
-
+    int samplingTime;
     void connectWiFi();
     void connectMQTT();
 
 public:
     MQTTConnection(const char *ssid, const char *password, const char *mqtt_server, const char *topic);
-
+    int getSamplingTime();
     void setup();
     void loop();
     void reconnect();
