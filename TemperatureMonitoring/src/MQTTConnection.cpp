@@ -3,7 +3,9 @@
 #include "MQTTConnection.h"
 
 MQTTConnection::MQTTConnection(const char *ssid, const char *password, const char *mqtt_server, const char *topic)
-    : ssid(ssid), password(password), mqtt_server(mqtt_server), topic(topic), client(espClient) {}
+    : ssid(ssid), password(password), mqtt_server(mqtt_server), topic(topic), client(espClient) {
+    this->samplingTime = 5000;
+    }
 
 int MQTTConnection::getSamplingTime()
 {

@@ -6,7 +6,6 @@ TMMSystem::TMMSystem()
     this->greenLed = new Led(LED_GREEN_PIN);
     this->sensor = new SensorTemp(TEMPERATURE_SENSOR_PIN);
     this->temperature = 0;
-    this->samplingTime = 5000;
 }
 
 float TMMSystem::getTemperature()
@@ -27,14 +26,4 @@ void TMMSystem::problem()
     this->redLed->switchOn();
 }
 
-int TMMSystem::getSamplingTime()
-{
-    return this->samplingTime;
-    
-    
-}
 
-void TMMSystem::setSamplingTime(int samplingTime)
-{
-    this->samplingTime = samplingTime;
-}
