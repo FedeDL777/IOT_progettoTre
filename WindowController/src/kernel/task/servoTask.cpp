@@ -38,12 +38,12 @@ void ServoTask::tick()
         machine->openManualServo();
         if (this->machine->buttonPressed() && this->elapsedTimeInState() > CHANGE_MODE_TIMEOUT)
         {
+            Serial.println("MANUAL -> NORMAL");
             setState(NORMAL);
         }
         machine->showManual();
         currentDegree = machine->getServoDegree();
         break;
-    
     }
 }
 
@@ -51,7 +51,7 @@ void ServoTask::setState(int newState)
 {
     currentState = newState;
     stateTimestamp = millis();
-    justEntered = true;
+    this->justEntered = true;
 }
 
 long ServoTask::elapsedTimeInState()
@@ -61,10 +61,13 @@ long ServoTask::elapsedTimeInState()
 
 void ServoTask::logOnce(const String &msg)
 {
-    if (justEntered)
+    if (this->justEntered)
     {
+        Serial.print("appena entrato");
+        Serial.println(msg);
+        Serial.println(this->justEntered);
         Logger.log(msg);
-        justEntered = false; // Assicura che venga resettato solo dopo il log
+        this->justEntered = false; // Assicura che venga resettato solo dopo il log
     }
 }
 
@@ -72,9 +75,9 @@ void ServoTask::checkMsg()
 {
     if (this->currentState != PROBLEM)
     {
-        if (machine->isManual())
+        if (machine->isManual() && this->currentState != MANUAL)
             setState(MANUAL);
-        else
+        else if (this->currentState != NORMAL && this->currentState != MANUAL)
             setState(NORMAL);
     }
 

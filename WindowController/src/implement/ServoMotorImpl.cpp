@@ -15,7 +15,6 @@ void ServoMotor::openDegree(int angle)
 {
 
   int correctedAngle = angle;
-  Serial.println("ServoMotor::anglee-> " + String(angle));
   if (angle > MAX_DEGREE)
   {
     correctedAngle = MAX_DEGREE;
@@ -26,7 +25,6 @@ void ServoMotor::openDegree(int angle)
   }
 
   this->motor.write(correctedAngle);
-  Serial.println("ServoMotor::openDegree -> " + String(correctedAngle));
 
 }
 
