@@ -79,6 +79,8 @@ void WMMSystem::openManualServo()
 
 int WMMSystem::getServoDegree()
 {
+    Serial.println("getServoDegree");
+    Serial.println(this->openDegreeServo);
     return this->openDegreeServo;
 }
 

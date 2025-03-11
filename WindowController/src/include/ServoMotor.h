@@ -3,8 +3,10 @@
 
 
 #include <arduino.h>
-#include "ServoTimer2.h"
-#include "../include/ServoTimer2.h"
+
+#include <Servo.h>	
+
+
 class ServoMotor{
 
 public:
@@ -17,7 +19,7 @@ public:
   void openDegree(int angle);  
 private:
   int pin; 
-  ServoTimer2 motor; 
+  Servo motor; 
 };
 
 #endif

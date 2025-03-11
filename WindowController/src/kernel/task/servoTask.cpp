@@ -24,6 +24,7 @@ void ServoTask::tick()
         if (this->machine->buttonPressed() && this->elapsedTimeInState() > CHANGE_MODE_TIMEOUT)
         {
             setState(MANUAL);
+            machine->setManual();
         }
         machine->showAutomatic();
         break;
@@ -38,8 +39,8 @@ void ServoTask::tick()
         machine->openManualServo();
         if (this->machine->buttonPressed() && this->elapsedTimeInState() > CHANGE_MODE_TIMEOUT)
         {
-            Serial.println("MANUAL -> NORMAL");
             setState(NORMAL);
+            machine->setNormal();
         }
         machine->showManual();
         currentDegree = machine->getServoDegree();
@@ -63,9 +64,6 @@ void ServoTask::logOnce(const String &msg)
 {
     if (this->justEntered)
     {
-        Serial.print("appena entrato");
-        Serial.println(msg);
-        Serial.println(this->justEntered);
         Logger.log(msg);
         this->justEntered = false; // Assicura che venga resettato solo dopo il log
     }
@@ -76,9 +74,16 @@ void ServoTask::checkMsg()
     if (this->currentState != PROBLEM)
     {
         if (machine->isManual() && this->currentState != MANUAL)
+        {
             setState(MANUAL);
+            machine->setManual();
+        }
+
         else if (this->currentState != NORMAL && this->currentState != MANUAL)
+        {
             setState(NORMAL);
+            machine->setNormal();
+        }
     }
 
     if (MsgService.isMsgAvailable())
@@ -102,6 +107,7 @@ void ServoTask::checkMsg()
                 {
                     this->currentDegree = apertureInt;
                     setState(NORMAL);
+                    machine->setNormal();
                 }
                 this->machine->setTemperature((int)temperature); // Convertiamo double -> int
 
@@ -112,6 +118,7 @@ void ServoTask::checkMsg()
                 else if (currentState == PROBLEM && stateChar != 'P')
                 {
                     setState(NORMAL);
+                    machine->setNormal();
                 }
             }
             delete msg;
