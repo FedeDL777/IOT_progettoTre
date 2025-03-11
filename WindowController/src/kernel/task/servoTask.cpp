@@ -43,6 +43,7 @@ void ServoTask::tick()
         machine->showManual();
         currentDegree = machine->getServoDegree();
         break;
+    
     }
 }
 
@@ -97,6 +98,7 @@ void ServoTask::checkMsg()
                 if (apertureInt >= 0 && apertureInt <= 90)
                 {
                     this->currentDegree = apertureInt;
+                    setState(NORMAL);
                 }
                 this->machine->setTemperature((int)temperature); // Convertiamo double -> int
 
