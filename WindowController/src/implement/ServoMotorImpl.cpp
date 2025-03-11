@@ -1,40 +1,46 @@
 #include "../include/ServoMotor.h"
 #include "Arduino.h"
-#include "../include/ServoTimer2.h"
+
 #define MIN_DEGREE 0
 #define MAX_DEGREE 90
-ServoMotor::ServoMotor(int pin){
-  this->pin = pin;  
-} 
+ServoMotor::ServoMotor(const int pin) : pin(pin) { }
 
-void ServoMotor::on(){
+void ServoMotor::on()
+{
   // updated values: min is 544, max 2400 (see ServoTimer2 doc)
-  motor.attach(pin); //, 544, 2400);    
+  motor.attach(pin); //, 544, 2400);
 }
 
-void ServoMotor::openDegree(int angle){
-	if (angle > MAX_DEGREE){
-		angle = MAX_DEGREE;
-	} else if (angle < MIN_DEGREE){
-		angle = MIN_DEGREE;
-	}
-  // 750 -> 0, 2250 -> 180 
-  // 750 + angle*(2250-750)/180
-  // updated values: min is 544, max 2400 (see ServoTimer2 doc)
-  float coeff = (2400.0-544.0)/180;
-  motor.write(544 + angle*coeff);              
+void ServoMotor::openDegree(int angle)
+{
+
+  int correctedAngle = angle;
+  Serial.println("ServoMotor::anglee-> " + String(angle));
+  if (angle > MAX_DEGREE)
+  {
+    correctedAngle = MAX_DEGREE;
+  }
+  else if (angle < MIN_DEGREE)
+  {
+    correctedAngle = MIN_DEGREE;
+  }
+
+  this->motor.write(correctedAngle);
+  Serial.println("ServoMotor::openDegree -> " + String(correctedAngle));
+
 }
 
-void ServoMotor::off(){
-  motor.detach();    
+void ServoMotor::off()
+{
+  motor.detach();
 }
 
 void ServoMotor::fullyOpen()
 {
-  this->openDegree(180);
+  this->openDegree(MAX_DEGREE);
 }
 
 void ServoMotor::close()
 {
-  this->openDegree(0);
+  this->openDegree(MIN_DEGREE);
 }

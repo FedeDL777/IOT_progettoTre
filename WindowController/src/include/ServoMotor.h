@@ -4,7 +4,7 @@
 
 #include <arduino.h>
 #include "ServoTimer2.h"
-
+#include "../include/ServoTimer2.h"
 class ServoMotor{
 
 public:

@@ -63,6 +63,5 @@ void LCD::initCursor()
 int LCD::mapOpening(int d)
 {
     d *= 1.11;
-    d += 0.1;
     return d;
 }

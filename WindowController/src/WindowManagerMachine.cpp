@@ -5,6 +5,7 @@ WMMSystem::WMMSystem()
 {
     this->userConsole = new LCD();
     this->window = new ServoMotor(SERVO_MOTOR);
+    this->window->on();
     this->manualSignal = new Pot(POTENTIOMETER);
     this->manualButton = new Button(BUTTON_SWITCH_MANUAL);
 
