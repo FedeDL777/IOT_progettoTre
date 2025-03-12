@@ -1,5 +1,7 @@
 package controlunitsubsystem.api;
 
+import java.util.Scanner;
+
 public interface ControlUnit {
 
     enum Status {
@@ -8,17 +10,21 @@ public interface ControlUnit {
         TOO_HOT,
         ALARM,
         MANUAL,
+        DASHBOARD,
     }
 
-    void setTemperature(double temperature);
+    /**
+     * Sends the message to the dashboard.
+     * 
+     * @return the response of the dashboard.
+     */
+    Scanner dashboardMessage();
 
-    void sendStatus();
+    void updateTemperature();//TODO: don't know MQTT
 
-    void setMotorAngle();
+    void sendMsgToMotor();
 
-    void sendMotorAngle();
-
-    void solveAlarm();
+    String receiveMsgFromMotor();
     
     void tick();
 }

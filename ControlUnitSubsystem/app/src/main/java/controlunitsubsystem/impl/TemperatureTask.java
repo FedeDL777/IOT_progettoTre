@@ -13,12 +13,12 @@ enum TemperatureState
     ALLARM
 } temperatureState;*/
 public class TemperatureTask extends Thread{
-    private ControlUnitImpl controlUnit;
+    private ControlUnitImpl2 controlUnit;
     private CommChannel tempChannel;
     private boolean running = true;
 
     
-    public TemperatureTask(ControlUnitImpl controlUnit, CommChannel espChannel){
+    public TemperatureTask(ControlUnitImpl2 controlUnit, CommChannel espChannel){
         this.controlUnit = controlUnit;
         this.tempChannel = espChannel;
     }

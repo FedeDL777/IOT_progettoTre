@@ -4,11 +4,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ControllerStatesTask extends Thread{
     
-    private ControlUnitImpl controlUnit;
+    private ControlUnitImpl2 controlUnit;
     private AtomicInteger period;
     private boolean running = true;
 
-    public ControllerStatesTask(ControlUnitImpl controlUnit, int period) {
+    public ControllerStatesTask(ControlUnitImpl2 controlUnit, int period) {
         this.controlUnit = controlUnit;
         this.period = new AtomicInteger(period);
     }
