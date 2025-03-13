@@ -13,7 +13,7 @@ WMMSystem::WMMSystem()
     this->userConsole->setup();
     this->userConsole->turnOn();
 
-    state = MANUAL; // Imposta lo stato iniziale corretto
+    state = NORMAL; // Imposta lo stato iniziale corretto
 
     temperature = 20;
     openDegreeServo = 0;

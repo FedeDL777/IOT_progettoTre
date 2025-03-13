@@ -7,8 +7,8 @@ ServoTask::ServoTask(WMMSystem *Machine) : machine(Machine)
     Serial.println("ST");
     this->justEntered = true;
     this->currentDegree = 0;
-    setState(MANUAL);
-    machine->setManual();
+    setState(NORMAL);
+    machine->setNormal();
     machine->closeServo();
 }
 
@@ -88,9 +88,10 @@ void ServoTask::checkMsg()
 
     if (MsgService.isMsgAvailable())
     {
+
         logOnce(F("[ST] Message available"));
         Msg *msg = MsgService.receiveMsg();
-        if (msg != NULL)
+        if (msg != NULL) //cambia
         {
             Serial.println("Message received");
             String content = msg->getContent();
