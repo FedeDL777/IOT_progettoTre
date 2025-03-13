@@ -1,8 +1,8 @@
 package controlunitsubsystem.api;
 
-import java.util.Scanner;
+import java.io.IOException;
 
 public interface HttpPostRequest {
 
-    Scanner postReceive(float temperature, String status, int level);
+    String postReceive(float temperature, String status, int level) throws IOException;
 }

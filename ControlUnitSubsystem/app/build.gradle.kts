@@ -25,6 +25,8 @@ dependencies {
     implementation(libs.guava)
 
     implementation("io.github.java-native:jssc:2.9.6")
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

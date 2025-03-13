@@ -1,5 +1,6 @@
 package controlunitsubsystem.impl;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -21,11 +22,11 @@ public class HttpPostRequestImpl implements HttpPostRequest {
     }
 
     @Override
-    public Scanner postReceive(float temperature, String status, int level) {
+    public String postReceive(float temperature, String status, int level) throws IOException {
         String jsonInputString = "{\"temperature\": " + temperature + ", \"status\": \"" + status + "\", \"level\": "
                 + level + "}";
 
-        try {
+        
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -40,16 +41,13 @@ public class HttpPostRequestImpl implements HttpPostRequest {
             int responseCode = conn.getResponseCode();
             System.out.println("Response Code: " + responseCode);
 
-            try (java.util.Scanner scanner = new java.util.Scanner(conn.getInputStream(),
+            try (Scanner scanner = new Scanner(conn.getInputStream(),
                     StandardCharsets.UTF_8.name())) {
                 String responseBody = scanner.useDelimiter("\\A").next();
                 System.out.println("Response: " + responseBody);
-                return scanner;
+                return responseBody;
             }
-        } catch (Exception e) {
-            System.err.println("Error in postReceive");
-        }
-        return new Scanner("");
+        
     }
 
 }

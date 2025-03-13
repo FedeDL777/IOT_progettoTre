@@ -20,7 +20,7 @@ class HttpServer:
         self.dashboardApp.update_state(status)
         self.dashboardApp.update_temperature(temperature)
         # Restituisce lo stato dell'allarme
-        return jsonify({"alarm": self.dashboardApp.alarmState(), "window_level": self.dashboardApp.get_window_level()})
+        return jsonify({"status": self.dashboardApp.getState(), "window_level": self.dashboardApp.get_window_level()})
 
     def ping(self):
         return jsonify({"message": "Server attivo!"})

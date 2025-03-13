@@ -2,6 +2,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class PostRequestExample {
     public static void main(String[] args) {
@@ -24,10 +25,10 @@ public class PostRequestExample {
             int responseCode = conn.getResponseCode();
             System.out.println("Response Code: " + responseCode);
 
-            try (java.util.Scanner scanner = new java.util.Scanner(conn.getInputStream(),
+            try (Scanner scanner = new Scanner(conn.getInputStream(),
                     StandardCharsets.UTF_8.name())) {
-                String responseBody = scanner.useDelimiter("\\A").next();
-                System.out.println("Response: " + responseBody);
+                //String responseBody = scanner.useDelimiter("\\A").next();
+                System.out.println("Response: " + scanner.nextFloat());
             }
 
             conn.disconnect();

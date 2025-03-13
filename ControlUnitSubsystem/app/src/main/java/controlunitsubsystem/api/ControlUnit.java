@@ -1,6 +1,6 @@
 package controlunitsubsystem.api;
 
-import java.util.Scanner;
+import java.io.IOException;
 
 public interface ControlUnit {
 
@@ -18,13 +18,13 @@ public interface ControlUnit {
      * 
      * @return the response of the dashboard.
      */
-    Scanner dashboardMessage();
+    String dashboardMessage() throws IOException;
 
-    void updateTemperature();//TODO: don't know MQTT
+    void updateTemperature();//TODO: don't know MQTT, this method should receive the temperature from the sensor with a thread listening on the MQTT line
 
     void sendMsgToMotor();
 
     String receiveMsgFromMotor();
     
-    void tick();
+    void dashboardTick();
 }

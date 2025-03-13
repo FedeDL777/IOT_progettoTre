@@ -13,6 +13,7 @@ class DashboardApp:
         self.window_level = 50
         self.alarm = False
         self.manual = False
+        self.dashState = "NORMAL"
 
         # Creazione finestra principale
         self.root = tk.Tk()
@@ -45,6 +46,7 @@ class DashboardApp:
 
         self.alarm_button = ttk.Button(control_frame, text="Reset Alarm", command=self.reset_alarm)
         self.alarm_button.grid(row=4, column=1, sticky="e")
+        self.alarm_button.config(state='disabled')
 
         # FRAME: Grafico con Matplotlib
         self.graph_frame = ttk.Frame(self.root)
@@ -93,6 +95,7 @@ class DashboardApp:
         if not self.alarm:
             self.state = status
             if status == "ALARM":
+                self.alarm_button.config(state='normal')
                 self.alarm = True
 
     def update_level(self, level):  # Chiamato dal server
@@ -104,8 +107,8 @@ class DashboardApp:
         self.max_temp = max(self.temperatures)
         self.min_temp = min(self.temperatures)
 
-    def alarmState(self):
-        return self.alarm
+    def getState(self):
+        return self.dashState
 
     def get_window_level(self):
         return self.window_level
@@ -115,15 +118,18 @@ class DashboardApp:
         if self.manual:
             self.window_slider.config(state='normal')
             self.manual_button.config(text="Automatic Mode")
+            self.dashState = "MANUAL"
         else:
             self.window_slider.config(state='disabled')
             self.manual_button.config(text="Manual Mode")
+            self.dashState = "NORMAL"
         self.window_label.config(text=f"Window Level: {self.window_level}%")
 
     def reset_alarm(self):
         self.alarm = False
-        self.state = "NORMAL"
+        self.dashState = "UNDEFINED"
         self.state_label.config(text=f"State: {self.state}")
+        self.alarm_button.config(state='disabled')
 
     def mainloop(self):
         self.root.mainloop()
