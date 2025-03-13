@@ -17,10 +17,10 @@ WMMSystem::WMMSystem()
 
     temperature = 20;
     openDegreeServo = 0;
-}
+}   
 
 void WMMSystem::switchState()
-{
+{   
     state = (state == MANUAL) ? NORMAL : MANUAL;
 }
 
@@ -70,7 +70,7 @@ void WMMSystem::openServo(int degree)
 }
 
 void WMMSystem::openManualServo()
-{
+{   
     if (state != MANUAL)
         return;
     openDegreeServo = manualSignal->getDegree();
@@ -79,8 +79,6 @@ void WMMSystem::openManualServo()
 
 int WMMSystem::getServoDegree()
 {
-    Serial.println("getServoDegree");
-    Serial.println(this->openDegreeServo);
     return this->openDegreeServo;
 }
 

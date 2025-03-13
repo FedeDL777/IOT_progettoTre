@@ -92,6 +92,7 @@ void ServoTask::checkMsg()
         Msg *msg = MsgService.receiveMsg();
         if (msg != NULL)
         {
+            Serial.println("Message received");
             String content = msg->getContent();
             char contentCopy[content.length() + 1];
             strcpy(contentCopy, content.c_str());
