@@ -3,6 +3,9 @@
  */
 package controlunitsubsystem;
 
+import controlunitsubsystem.impl.ControlUnitImpl;
+import controlunitsubsystem.api.ControlUnit;
+
 public class App {
     public String getGreeting() {
         return "Hello World!";
@@ -10,5 +13,8 @@ public class App {
 
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
+
+        ControlUnit controlUnit = new ControlUnitImpl("http://127.0.0.1:5000/send");
+        controlUnit.dashboardTick();
     }
 }

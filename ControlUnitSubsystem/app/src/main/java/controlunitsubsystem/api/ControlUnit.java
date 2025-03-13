@@ -1,5 +1,7 @@
 package controlunitsubsystem.api;
 
+import java.io.IOException;
+
 public interface ControlUnit {
 
     enum Status {
@@ -8,17 +10,21 @@ public interface ControlUnit {
         TOO_HOT,
         ALARM,
         MANUAL,
+        DASHBOARD,
     }
 
-    void setTemperature(double temperature);
+    /**
+     * Sends the message to the dashboard.
+     * 
+     * @return the response of the dashboard.
+     */
+    String dashboardMessage() throws IOException;
 
-    void sendStatus();
+    void updateTemperature();//TODO: don't know MQTT, this method should receive the temperature from the sensor with a thread listening on the MQTT line
 
-    void setMotorAngle();
+    void sendMsgToMotor();
 
-    void sendMotorAngle();
-
-    void solveAlarm();
+    String receiveMsgFromMotor();
     
-    void tick();
+    void dashboardTick();
 }
