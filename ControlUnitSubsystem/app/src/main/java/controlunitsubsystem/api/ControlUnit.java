@@ -23,8 +23,14 @@ public interface ControlUnit {
     void updateTemperature();//TODO: don't know MQTT, this method should receive the temperature from the sensor with a thread listening on the MQTT line
 
     void sendMsgToMotor();
-
-    String receiveMsgFromMotor();
     
     void dashboardTick();
+
+    /**
+     * Updates the motor and the status.
+     * @return the status of the system.
+     */
+    Status updateMotorAndStatusTick();
+
+    void destroy();
 }

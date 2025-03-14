@@ -13,8 +13,11 @@ public class App {
 
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
+        String comPortName = "COM3";
 
-        ControlUnit controlUnit = new ControlUnitImpl("http://127.0.0.1:5000/send");
+        ControlUnit controlUnit = new ControlUnitImpl("http://127.0.0.1:5000/send", comPortName);
         controlUnit.dashboardTick();
+
+        controlUnit.destroy();
     }
 }
