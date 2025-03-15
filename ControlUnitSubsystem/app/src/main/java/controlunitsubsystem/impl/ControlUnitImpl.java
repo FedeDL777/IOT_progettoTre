@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import controlunitsubsystem.api.CommChannel;
 import controlunitsubsystem.api.ControlUnit;
 import controlunitsubsystem.api.HttpPostRequest;
@@ -19,6 +21,7 @@ public class ControlUnitImpl implements ControlUnit {
     int motorAngle = 0;
     final HttpPostRequest dashboard;
     CommChannel serialLine;
+    MQTTTemperatureReceiver temperatureReceiver;
 
     final float T1 = 23;
     final float T2 = 26;
@@ -30,6 +33,13 @@ public class ControlUnitImpl implements ControlUnit {
             System.err.println("Error while initializing serial line: " + e.getMessage());
             System.exit(1);
         }
+
+        try{
+            this.temperatureReceiver = new MQTTTemperatureReceiver();
+        } catch (MqttException e) {
+            System.err.println("Error while initializing MQTT receiver: " + e.getMessage());
+            System.exit(1);
+        }
         this.dashboard = new HttpPostRequestImpl(url);
     }
 
@@ -39,9 +49,8 @@ public class ControlUnitImpl implements ControlUnit {
     }
 
     @Override
-    public void updateTemperature() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateTemperature'");
+    public void updateTemperature(int timeout) {
+        lastTemperature = temperatureReceiver.receiveTemperature(timeout);
     }
 
     @Override
@@ -81,11 +90,12 @@ public class ControlUnitImpl implements ControlUnit {
     @Override
     public void destroy() {
         serialLine.close();
+        temperatureReceiver.disconnect();
     }
 
     @Override
-    public Status updateMotorAndStatusTick() {
-        updateTemperature();
+    public Status updateMotorAndStatusTick(int timeout) {
+        updateTemperature(timeout);
         if (status != Status.ALARM || status != Status.DASHBOARD) {
             if (lastTemperature < T1) {
                 status = Status.NORMAL;

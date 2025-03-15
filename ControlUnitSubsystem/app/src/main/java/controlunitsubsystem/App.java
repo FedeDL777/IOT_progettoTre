@@ -17,6 +17,7 @@ public class App {
 
         ControlUnit controlUnit = new ControlUnitImpl("http://127.0.0.1:5000/send", comPortName);
         controlUnit.dashboardTick();
+        controlUnit.updateMotorAndStatusTick(1000);
 
         controlUnit.destroy();
     }
