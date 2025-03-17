@@ -11,6 +11,8 @@
 #define WIFI_SSID "*"
 #define WIFI_PASSWORD "ciao"
 #define MQTT_SERVER "broker.mqtt-dashboard.com" //
-#define TOPIC "IOT-Progetto-03"
+#define TOPIC_PER "IOT-Progetto-03-period"
+#define TOPIC_TEMP "IOT-Progetto-03-temp"
+
 
 #endif

@@ -2,10 +2,18 @@
 #include <PubSubClient.h>
 #include "MQTTConnection.h"
 
-MQTTConnection::MQTTConnection(const char *ssid, const char *password, const char *mqtt_server, const char *topic)
-    : ssid(ssid), password(password), mqtt_server(mqtt_server), topic(topic), client(espClient) {
+MQTTConnection::MQTTConnection(const char *ssid, const char *password, const char *mqtt_server, const char **topics, int numTopics)
+    : ssid(ssid), password(password), mqtt_server(mqtt_server), client(espClient), numTopics(numTopics) {
     this->samplingTime = 5000;
+    this->topics = new const char *[numTopics];
+    for (int i = 0; i < numTopics; ++i) {
+        this->topics[i] = topics[i];
     }
+}
+
+MQTTConnection::~MQTTConnection() {
+    delete[] topics;
+}
 
 int MQTTConnection::getSamplingTime()
 {
@@ -45,7 +53,9 @@ void MQTTConnection::connectMQTT()
         if (client.connect(clientId.c_str()))
         {
             Serial.println("Connected!");
-            client.subscribe(topic);
+            for (int i = 0; i < numTopics; ++i) {
+                client.subscribe(topics[i]);
+            }
             client.setCallback(std::bind(&MQTTConnection::callback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         }
         else
@@ -83,9 +93,9 @@ bool MQTTConnection::isConnected()
     return this->client.connected();
 }
 
-bool MQTTConnection::publish(const char *message)
+bool MQTTConnection::publish(const char *topic, const char *message)
 {
-    if (client.connected())
+    if (client.connected() && topic == TOPIC_TEMP)
     {
         return client.publish(topic, message);
     }
@@ -94,27 +104,28 @@ bool MQTTConnection::publish(const char *message)
 
 void MQTTConnection::callback(char *topic, byte *payload, unsigned int length)
 {
-    // Assicuriamoci che il payload sia una stringa terminata con null
     char message[length + 1];
     memcpy(message, payload, length);
     message[length] = '\0';
 
     Serial.println(String("Message arrived on [") + topic + "] len: " + length + ", message: " + String(message));
 
-    // Controlliamo se il messaggio inizia con "cu:"
-    if (strncmp(message, "cu:", 3) == 0)
-    {
-        String content = String(message).substring(3);
-        
-        // Verifica che il contenuto sia un numero
-        if (content.length() > 0 && content.toInt() > 0)
-        {
-            this->samplingTime = content.toInt();
-            Serial.println("Sampling period changed to: " + String(this->samplingTime));
-        }
-        else
-        {
-            Serial.println("Invalid sampling period received: " + content);
+    for (int i = 0; i < numTopics; ++i) {
+        if (strcmp(topic, this->topics[i]) == 0) {
+            if (this->topics[i] == TOPIC_TEMP) {
+                Serial.println("Handling temperature topic");
+            }
+             else if (this->topics[i] == TOPIC_PER) {
+                if (strncmp(message, "cu:", 3) == 0) {
+                    String content = String(message).substring(3);
+                    if (content.length() > 0 && content.toInt() > 0) {
+                        this->samplingTime = content.toInt();
+                        Serial.println("Sampling period changed to: " + String(this->samplingTime));
+                    } else {
+                        Serial.println("Invalid sampling period received: " + content);
+                    }
+                }
+            }
         }
     }
 }

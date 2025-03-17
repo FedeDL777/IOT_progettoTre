@@ -1,18 +1,11 @@
-/*
- * HTTPClient lib --  Performing an HTTP POST to our REST service
- *
- * Remark:
- * - Going through ngrok
- *
- */
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include "include/set_up.h"
 #include "TempMonitoringMachine.h"
-
 #include "MQTTConnection.h"
 
 #define NORMAL_SAMPLE 5000
+
 unsigned long lastSample;
 unsigned long checkSample;
 
@@ -22,14 +15,17 @@ enum NetworkState
     CONNECTED
 } networkState;
 
-MQTTConnection mqttConnection(WIFI_SSID, WIFI_PASSWORD, MQTT_SERVER, TOPIC);
+MQTTConnection mqttConnection(WIFI_SSID, WIFI_PASSWORD, MQTT_SERVER, (const char *[]){TOPIC_PER, TOPIC_TEMP}, 2);
 TMMSystem *machine;
+
 void setup()
 {
     Serial.begin(115200);
     machine = new TMMSystem();
     mqttConnection.setup();
-    networkState = CONNECTED;
+
+    // Verifica connessione iniziale
+    networkState = (WiFi.status() == WL_CONNECTED) ? CONNECTED : NOT_CONNECTED;
     lastSample = millis();
     checkSample = NORMAL_SAMPLE;
 }
@@ -45,15 +41,18 @@ void loop()
         }
         else
         {
-
             mqttConnection.loop();
-            if (millis() > lastSample + checkSample)
+            if (millis() - lastSample >= checkSample)
             {
                 lastSample = millis();
                 checkSample = mqttConnection.getSamplingTime();
+
                 float temperature = machine->getTemperature();
-                Serial.println("Publishing: " + String(temperature)); /// guardaci
-                mqttConnection.publish(("ts:" + String(temperature)).c_str());
+                char temperatureStr[10];
+                dtostrf(temperature, 6, 2, temperatureStr);
+
+                Serial.println("Publishing: " + String(temperature));
+                mqttConnection.publish(TOPIC_TEMP, temperatureStr);
             }
         }
     }
@@ -67,3 +66,4 @@ void loop()
         }
     }
 }
+
