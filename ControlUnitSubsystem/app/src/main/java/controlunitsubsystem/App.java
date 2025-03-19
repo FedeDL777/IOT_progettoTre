@@ -20,12 +20,14 @@ public class App {
         final int P1 = 1000;
         final int P2 = 500;
         int period = P1;
+        long lastTime;
         Status status = Status.NORMAL;
 
         ControlUnit controlUnit = new ControlUnitImpl("http://127.0.0.1:5000/send", comPortName);
 
         controlUnit.sendPeriod(period);
         while (true) {
+            lastTime = System.currentTimeMillis();
             status = controlUnit.updateMotorAndStatusTick(period);
             if (status == Status.NORMAL) {
                 if (period != P1) {
@@ -40,7 +42,7 @@ public class App {
             }
             controlUnit.dashboardTick();
             try {
-                Thread.sleep(period / 2);
+                Thread.sleep(Math.round(((lastTime + period) - System.currentTimeMillis()) * 0.8));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
