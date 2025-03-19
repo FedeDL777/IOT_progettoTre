@@ -59,7 +59,7 @@ public class ControlUnitImpl implements ControlUnit {
 
     @Override
     public void updateTemperature(int timeout) {
-        lastTemperature = temperatureReceiver.receiveTemperature(timeout);
+        lastTemperature = temperatureReceiver.getTemperature();
     }
 
     @Override

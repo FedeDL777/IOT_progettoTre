@@ -12,8 +12,9 @@ public class MQTTTemperatureReceiver {
     private final String broker = "tcp://broker.mqtt-dashboard.com:1883";
     private final String topic_temp = "IOT-Progetto-03-temp";
     private final String topic_control = "IOT-Progetto-03-per";
+    private float temperature;
 
-
+    private final float NORMAL_TEMP = 25;
     private final Integer samplingNormal = 5000;
     private final float HOT_TEMP = 30;
     private final Integer samplingHot  = 1000;
@@ -23,7 +24,7 @@ public class MQTTTemperatureReceiver {
 
     public MQTTTemperatureReceiver() throws MqttException {
         String clientId = "JavaMqttClient-" + System.currentTimeMillis();
-
+        temperature = NORMAL_TEMP;
         // Creazione e configurazione del client
         client = new MqttClient(broker, clientId, new MemoryPersistence());
         MqttConnectOptions options = new MqttConnectOptions();
@@ -59,7 +60,12 @@ public class MQTTTemperatureReceiver {
         System.out.println("Connesso e sottoscritto al topic: " + topic_temp);
     }
 
-    public void controlTemperature() {
+
+    public float getTemperature() {
+        this.controlTemperature();  
+        return this.temperature;
+    }
+    private void controlTemperature() {
         try {
             Float temperature = temperatureQueue.poll(5000, TimeUnit.MILLISECONDS);
             if (temperature != null) {
@@ -68,6 +74,7 @@ public class MQTTTemperatureReceiver {
             } else {
                 System.out.println("Nessun dato di temperatura ricevuto nel tempo previsto.");
             }
+            this.temperature = temperature;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
