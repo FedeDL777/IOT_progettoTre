@@ -4,6 +4,9 @@
 package controlunitsubsystem;
 
 import controlunitsubsystem.impl.ControlUnitImpl;
+
+import controlunitsubsystem.api.ControlUnit.Status;
+
 import controlunitsubsystem.api.ControlUnit;
 
 public class App {
@@ -14,11 +17,35 @@ public class App {
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
         String comPortName = "COM3";
+        final int P1 = 1000;
+        final int P2 = 500;
+        int period = P1;
+        Status status = Status.NORMAL;
 
         ControlUnit controlUnit = new ControlUnitImpl("http://127.0.0.1:5000/send", comPortName);
-        controlUnit.dashboardTick();
-        controlUnit.updateMotorAndStatusTick(1000);
 
-        controlUnit.destroy();
+        controlUnit.sendPeriod(period);
+        while (true) {
+            status = controlUnit.updateMotorAndStatusTick(period);
+            if (status == Status.NORMAL) {
+                if (period != P1) {
+                    period = P1;
+                    controlUnit.sendPeriod(period);
+                }
+            } else {
+                if (period != P2) {
+                    period = P2;
+                    controlUnit.sendPeriod(period);
+                }
+            }
+            controlUnit.dashboardTick();
+            try {
+                Thread.sleep(period / 2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // controlUnit.destroy();
     }
 }
