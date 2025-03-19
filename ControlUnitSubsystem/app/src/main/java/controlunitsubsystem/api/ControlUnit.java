@@ -20,7 +20,9 @@ public interface ControlUnit {
      */
     String dashboardMessage() throws IOException;
 
-    void updateTemperature(int timeoutMillis);//TODO: don't know MQTT, this method should receive the temperature from the sensor with a thread listening on the MQTT line
+    void updateTemperature(int timeoutMillis);
+
+    void sendPeriod(int period);
 
     void sendMsgToMotor();
     

@@ -22,6 +22,7 @@ public class ControlUnitImpl implements ControlUnit {
     final HttpPostRequest dashboard;
     CommChannel serialLine;
     MQTTTemperatureReceiver temperatureReceiver;
+    MQTTPeriodSender periodSender;
 
     final float T1 = 23;
     final float T2 = 26;
@@ -40,6 +41,14 @@ public class ControlUnitImpl implements ControlUnit {
             System.err.println("Error while initializing MQTT receiver: " + e.getMessage());
             System.exit(1);
         }
+
+        try {
+            this.periodSender = new MQTTPeriodSender();
+        }catch (MqttException e) {
+            System.err.println("Error while initializing MQTT sender: " + e.getMessage());
+            System.exit(1);
+        }
+
         this.dashboard = new HttpPostRequestImpl(url);
     }
 
@@ -51,6 +60,15 @@ public class ControlUnitImpl implements ControlUnit {
     @Override
     public void updateTemperature(int timeout) {
         lastTemperature = temperatureReceiver.receiveTemperature(timeout);
+    }
+
+    @Override
+    public void sendPeriod(int period) {
+        try {
+            periodSender.sendPeriod(period);
+        } catch (MqttException e) {
+            System.err.println("Error while sending period: " + e.getMessage());
+        }
     }
 
     @Override
@@ -91,6 +109,7 @@ public class ControlUnitImpl implements ControlUnit {
     public void destroy() {
         serialLine.close();
         temperatureReceiver.disconnect();
+        periodSender.disconnect();
     }
 
     @Override
