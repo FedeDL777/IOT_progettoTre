@@ -26,7 +26,10 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+
+    implementation 'com.fazecast:jSerialComm:2.9.2'
 }
+
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
