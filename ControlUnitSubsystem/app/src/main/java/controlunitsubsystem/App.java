@@ -16,7 +16,7 @@ public class App {
 
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
-        String comPortName = "COM3";
+        String comPortName = SerialPortDetector.findArduinoPort();
         final int P1 = 1000;
         final int P2 = 500;
         int period = P1;
