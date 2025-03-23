@@ -7,30 +7,25 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class MQTTTemperatureReceiver {
-
     private MqttClient client;
     private final String broker = "tcp://broker.mqtt-dashboard.com:1883";
-    private final String topic_temp = "IOT-Progetto-03-temp";
-    private final String topic_control = "IOT-Progetto-03-per";
-    private float temperature;
-
-    private final float NORMAL_TEMP = 25;
-    private final Integer samplingNormal = 5000;
-    private final float HOT_TEMP = 30;
-    private final Integer samplingHot  = 1000;
-    //private final float TOO_HOT_TEMP = 35;
-
+    private final String topic = "IOT-Progetto-03";
     private final BlockingQueue<Float> temperatureQueue = new LinkedBlockingQueue<>();
 
+    /**
+     * Inizializza e connette il ricevitore MQTT.
+     * 
+     * @throws MqttException se si verifica un errore nella connessione MQTT
+     */
     public MQTTTemperatureReceiver() throws MqttException {
         String clientId = "JavaMqttClient-" + System.currentTimeMillis();
-        temperature = NORMAL_TEMP;
+
         // Creazione e configurazione del client
         client = new MqttClient(broker, clientId, new MemoryPersistence());
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
 
-        // Configura il callback
+        // Configura il callback per i messaggi
         client.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {
@@ -40,11 +35,12 @@ public class MQTTTemperatureReceiver {
             @Override
             public void messageArrived(String topic, MqttMessage message) {
                 try {
+                    // Converte il messaggio in float e lo mette nella coda
                     String strValue = new String(message.getPayload());
                     float temperature = Float.parseFloat(strValue);
                     temperatureQueue.add(temperature);
                 } catch (NumberFormatException e) {
-                    System.out.println("Messaggio ricevuto non valido: " + new String(message.getPayload()));
+                    System.out.println("Messaggio ricevuto non è un float valido: " + new String(message.getPayload()));
                 }
             }
 
@@ -54,50 +50,33 @@ public class MQTTTemperatureReceiver {
             }
         });
 
-        // Connessione al broker e sottoscrizione al topic temperatura
+        // Connessione al broker
         client.connect(options);
-        client.subscribe(topic_temp, 0);
-        System.out.println("Connesso e sottoscritto al topic: " + topic_temp);
+
+        // Sottoscrizione al topic
+        client.subscribe(topic, 0);
+        System.out.println("Connesso e sottoscritto al topic: " + topic);
     }
 
-
-    public float getTemperature() {
-        this.controlTemperature();  
-        return this.temperature;
-    }
-    private void controlTemperature() {
+    /**
+     * Riceve un valore di temperatura dal topic MQTT.
+     * Attende fino a quando non arriva una temperatura o fino al timeout.
+     * 
+     * @param timeoutMillis millisecondi di attesa prima di ritornare null
+     * @return il valore di temperatura o null se si è verificato un timeout
+     */
+    public Float receiveTemperature(int timeoutMillis) {
         try {
-            Float temperature = temperatureQueue.poll(5000, TimeUnit.MILLISECONDS);
-            if (temperature != null) {
-                int newFrequency = determineFrequency(temperature);
-                sendControlMessage(newFrequency);
-            } else {
-                System.out.println("Nessun dato di temperatura ricevuto nel tempo previsto.");
-            }
-            this.temperature = temperature;
+            return temperatureQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return null;
         }
     }
 
-    private int determineFrequency(float temperature) {
-        if (temperature > HOT_TEMP) {
-            return samplingHot; // Campionamento frequente
-        } else {
-            return samplingNormal; // Campionamento meno frequente
-        }
-    }
-
-    private void sendControlMessage(int frequency) {
-        try {
-            String message = "cu:" + frequency;
-            client.publish(topic_control, new MqttMessage(message.getBytes()));
-            System.out.println("Inviato nuovo periodo di campionamento: " + frequency + " ms");
-        } catch (MqttException e) {
-            System.err.println("Errore durante l'invio del messaggio di controllo: " + e.getMessage());
-        }
-    }
-
+    /**
+     * Chiude la connessione MQTT.
+     */
     public void disconnect() {
         try {
             if (client != null && client.isConnected()) {
@@ -108,15 +87,4 @@ public class MQTTTemperatureReceiver {
             System.err.println("Errore durante la disconnessione: " + e.getMessage());
         }
     }
-/* 
-    public static void main(String[] args) {
-        try {
-            MQTTTemperatureReceiver controller = new MQTTTemperatureReceiver();
-            while (true) {
-                controller.controlTemperature();
-            }
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }*/
 }
