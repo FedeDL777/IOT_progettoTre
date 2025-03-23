@@ -26,12 +26,14 @@ void setup()
 
     // Verifica connessione iniziale
     networkState = (WiFi.status() == WL_CONNECTED) ? CONNECTED : NOT_CONNECTED;
+    networkState == CONNECTED ? machine->normal() : machine->problem();
     lastSample = millis();
     checkSample = NORMAL_SAMPLE;
 }
 
 void loop()
 {
+    
     if (networkState == CONNECTED)
     {
         if (!mqttConnection.isConnected())
@@ -48,6 +50,7 @@ void loop()
                 checkSample = mqttConnection.getSamplingTime();
 
                 float temperature = machine->getTemperature();
+                Serial.println(temperature);
                 char temperatureStr[10];
                 dtostrf(temperature, 6, 2, temperatureStr);
 
@@ -66,4 +69,3 @@ void loop()
         }
     }
 }
-

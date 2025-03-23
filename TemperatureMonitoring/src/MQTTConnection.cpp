@@ -11,10 +11,6 @@ MQTTConnection::MQTTConnection(const char *ssid, const char *password, const cha
     }
 }
 
-MQTTConnection::~MQTTConnection() {
-    delete[] topics;
-}
-
 int MQTTConnection::getSamplingTime()
 {
     return this->samplingTime;

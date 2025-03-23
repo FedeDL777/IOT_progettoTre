@@ -27,7 +27,7 @@ dependencies {
 
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
 
-    implementation 'com.fazecast:jSerialComm:2.9.2'
+    implementation ("com.fazecast:jSerialComm:2.9.2")
 }
 
 
