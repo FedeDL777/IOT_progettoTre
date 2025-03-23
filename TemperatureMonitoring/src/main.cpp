@@ -14,10 +14,10 @@ enum NetworkState
     NOT_CONNECTED,
     CONNECTED
 } networkState;
-
-MQTTConnection mqttConnection(WIFI_SSID, WIFI_PASSWORD, MQTT_SERVER, (const char *[]){TOPIC_PER, TOPIC_TEMP}, 2);
+const char* mqtt_server = "test.mosquitto.org";
+MQTTConnection mqttConnection(WIFI_SSID, WIFI_PASSWORD, mqtt_server, (const char *[]){TOPIC_PER, TOPIC_TEMP}, 2);
 TMMSystem *machine;
-
+/**/
 void setup()
 {
     Serial.begin(115200);

@@ -6,24 +6,17 @@ import java.util.concurrent.TimeUnit;
 
 public class MQTTTemperatureREceiver {
     private MqttClient client;
-    private final String broker = "tcp://broker.mqtt-dashboard.com:1883";
+    private final String broker = "tcp://test.mosquitto.org:1883"; // Broker aggiornato
     private final String topic = "IOT-Progetto-03-temp";
     private final BlockingQueue<Float> temperatureQueue = new LinkedBlockingQueue<>();
 
-    /**
-     * Inizializza e connette il ricevitore MQTT.
-     * 
-     * @throws MqttException se si verifica un errore nella connessione MQTT
-     */
     public MQTTTemperatureREceiver() throws MqttException {
         String clientId = "JavaMqttClient-" + System.currentTimeMillis();
 
-        // Creazione e configurazione del client
         client = new MqttClient(broker, clientId, new MemoryPersistence());
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
 
-        // Configura il callback per i messaggi
         client.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {
@@ -33,12 +26,12 @@ public class MQTTTemperatureREceiver {
             @Override
             public void messageArrived(String topic, MqttMessage message) {
                 try {
-                    // Converte il messaggio in float e lo mette nella coda
                     String strValue = new String(message.getPayload());
                     float temperature = Float.parseFloat(strValue);
                     temperatureQueue.add(temperature);
+                    System.out.println("Temperatura ricevuta: " + temperature);
                 } catch (NumberFormatException e) {
-                    System.out.println("Messaggio ricevuto non è un float valido: " + new String(message.getPayload()));
+                    System.out.println("Messaggio non valido: " + new String(message.getPayload()));
                 }
             }
 
@@ -48,21 +41,11 @@ public class MQTTTemperatureREceiver {
             }
         });
 
-        // Connessione al broker
         client.connect(options);
-
-        // Sottoscrizione al topic
         client.subscribe(topic, 0);
-        System.out.println("Connesso e sottoscritto al topic: " + topic);
+        System.out.println("Connesso a " + broker + " e sottoscritto al topic: " + topic);
     }
 
-    /**
-     * Riceve un valore di temperatura dal topic MQTT.
-     * Attende fino a quando non arriva una temperatura o fino al timeout.
-     * 
-     * @param timeoutSeconds secondi di attesa prima di ritornare null
-     * @return il valore di temperatura o null se si è verificato un timeout
-     */
     public Float receiveTemperature(int timeoutSeconds) {
         try {
             return temperatureQueue.poll(timeoutSeconds, TimeUnit.SECONDS);
@@ -72,9 +55,6 @@ public class MQTTTemperatureREceiver {
         }
     }
 
-    /**
-     * Chiude la connessione MQTT.
-     */
     public void disconnect() {
         try {
             if (client != null && client.isConnected()) {
@@ -86,13 +66,12 @@ public class MQTTTemperatureREceiver {
         }
     }
 
-    // Esempio di utilizzo
     public static void main(String[] args) {
         try {
             MQTTTemperatureREceiver receiver = new MQTTTemperatureREceiver();
 
             System.out.println("In attesa di temperatura...");
-            Float temp = receiver.receiveTemperature(30); // attende fino a 30 secondi
+            Float temp = receiver.receiveTemperature(30);
 
             if (temp != null) {
                 System.out.println("Temperatura ricevuta: " + temp);

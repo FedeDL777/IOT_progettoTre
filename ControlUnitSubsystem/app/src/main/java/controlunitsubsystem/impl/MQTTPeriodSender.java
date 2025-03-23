@@ -5,8 +5,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MQTTPeriodSender {
     private MqttClient client;
-    private final String broker = "tcp://broker.mqtt-dashboard.com:1883";
-    private final String topic = "IOT-Progetto-03-period";
+    private final String broker = "tcp://test.mosquitto.org:1883";
+    private final String topic = "IOT-Progetto-03-per";
 
     /**
      * Inizializza e connette il sender MQTT.
