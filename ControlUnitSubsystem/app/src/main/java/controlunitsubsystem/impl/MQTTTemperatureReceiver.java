@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MQTTTemperatureReceiver {
     private MqttClient client;
-    private final String broker = "tcp://broker.mqtt-dashboard.com:1883";
-    private final String topic = "IOT-Progetto-03";
+    private final String broker = "tcp://test.mosquitto.org:1883";
+    private final String topic = "IOT-Progetto-03-temp";
     private final BlockingQueue<Float> temperatureQueue = new LinkedBlockingQueue<>();
 
     /**

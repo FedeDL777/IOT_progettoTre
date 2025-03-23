@@ -35,7 +35,7 @@ public class ControlUnitImpl implements ControlUnit {
             System.exit(1);
         }
 
-        try{
+        try {
             this.temperatureReceiver = new MQTTTemperatureReceiver();
         } catch (MqttException e) {
             System.err.println("Error while initializing MQTT receiver: " + e.getMessage());
@@ -44,7 +44,7 @@ public class ControlUnitImpl implements ControlUnit {
 
         try {
             this.periodSender = new MQTTPeriodSender();
-        }catch (MqttException e) {
+        } catch (MqttException e) {
             System.err.println("Error while initializing MQTT sender: " + e.getMessage());
             System.exit(1);
         }
@@ -59,7 +59,7 @@ public class ControlUnitImpl implements ControlUnit {
 
     @Override
     public void updateTemperature(int timeout) {
-        lastTemperature = temperatureReceiver.getTemperature();
+        lastTemperature = temperatureReceiver.receiveTemperature(timeout);
     }
 
     @Override
