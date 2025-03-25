@@ -19,8 +19,8 @@ void ServoTask::tick()
     {
     case NORMAL:
         logOnce("NORMAL");
-        machine->openServo(currentDegree);
-        machine->setDegreeServo(currentDegree);
+        machine->openServo(this->currentDegree);
+        machine->setDegreeServo(this->currentDegree);
         if (this->machine->buttonPressed() && this->elapsedTimeInState() > CHANGE_MODE_TIMEOUT)
         {
             setState(MANUAL);
@@ -78,7 +78,6 @@ void ServoTask::checkMsg()
             setState(MANUAL);
             machine->setManual();
         }
-
         else if (this->currentState != NORMAL && this->currentState != MANUAL)
         {
             setState(NORMAL);
@@ -88,41 +87,62 @@ void ServoTask::checkMsg()
 
     if (MsgService.isMsgAvailable())
     {
-
         logOnce(F("[ST] Message available"));
+
         Msg *msg = MsgService.receiveMsg();
-        if (msg != NULL) //cambia
+        if (msg != NULL)
         {
+            // Attiva il buzzer brevemente per segnalare il messaggio ricevuto
+
+
             Serial.println("Message received");
+
             String content = msg->getContent();
-            char contentCopy[content.length() + 1];
-            strcpy(contentCopy, content.c_str());
-
-            int apertureInt;
-            double temperature;
-            char stateChar;
-
-            // Corretto sscanf con "%lf" per leggere correttamente il double
-            if (sscanf(contentCopy, "%c;%d;%lf", &stateChar, &apertureInt, &temperature) == 3)
-            {
-                if (apertureInt >= 0 && apertureInt <= 90)
-                {
-                    this->currentDegree = apertureInt;
-                    setState(NORMAL);
-                    machine->setNormal();
+            content.trim();          // Remove spaces and newlines
+            content.replace("\"", "");  // Remove extra quotes
+        
+            Serial.println("Cleaned message: " + content);
+        
+            // Split the string using ',' as a separator
+            int firstComma = content.indexOf(',');
+            int secondComma = content.indexOf(',', firstComma + 1);
+        
+            if (firstComma != -1 && secondComma != -1) {
+                String stateStr = content.substring(0, firstComma);
+                int apertureInt = content.substring(firstComma + 1, secondComma).toInt();
+                float temperature = content.substring(secondComma + 1).toFloat();
+        
+                if (stateStr == "N") {
+                    tone(BUZZER_PIN, 40*10);
+                    delay(200);
+                    noTone(BUZZER_PIN);
+                    Serial.println("Parsed message: Angle=" + String(apertureInt) + " Temperature=" + String(temperature));
+    
+                    if (apertureInt >= 0 && apertureInt <= 90)
+                    {
+    
+                        tone(BUZZER_PIN, 90*10);
+                        delay(200);
+                        noTone(BUZZER_PIN);
+                        delay(50);
+                        Serial.println("Valid angle received, updating system...");
+                        this->currentDegree = apertureInt;
+                    }
+    
+                    this->machine->setTemperature((int)temperature); // Converti double in int
+    
+                    if (currentState == PROBLEM)
+                    {
+                        setState(NORMAL);
+                        machine->setNormal();
+                    }
+                } else {
+                    Serial.println("Invalid state character");
                 }
-                this->machine->setTemperature((int)temperature); // Convertiamo double -> int
-
-                if (stateChar == 'P')
-                {
-                    setState(PROBLEM);
-                }
-                else if (currentState == PROBLEM && stateChar != 'P')
-                {
-                    setState(NORMAL);
-                    machine->setNormal();
-                }
+            } else {
+                Serial.println("Invalid message format");
             }
+
             delete msg;
         }
     }

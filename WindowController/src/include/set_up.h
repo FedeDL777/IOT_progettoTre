@@ -4,6 +4,7 @@
 
 #define BUTTON_SWITCH_MANUAL 2
 #define SERVO_MOTOR 6
+#define BUZZER_PIN 3
 
 #define POTENTIOMETER A0
 

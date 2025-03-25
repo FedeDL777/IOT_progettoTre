@@ -59,7 +59,12 @@ public class ControlUnitImpl implements ControlUnit {
 
     @Override
     public void updateTemperature(int timeout) {
-        lastTemperature = temperatureReceiver.receiveTemperature(timeout);
+        Float newTemperature = temperatureReceiver.receiveTemperature(timeout);
+        while(newTemperature == null){
+            newTemperature = temperatureReceiver.receiveTemperature(timeout);
+        }
+        lastTemperature = newTemperature;
+        
     }
 
     @Override
@@ -73,7 +78,7 @@ public class ControlUnitImpl implements ControlUnit {
 
     @Override
     public void sendMsgToMotor() {
-        serialLine.sendMsg("N;" + motorAngle + ";" + lastTemperature);
+        serialLine.sendMsg("N," + motorAngle + "," + lastTemperature);
     }
 
     @Override

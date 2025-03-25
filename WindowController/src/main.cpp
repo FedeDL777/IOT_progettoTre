@@ -12,7 +12,7 @@ void setup()
 {
   MsgService.init();
   sched.init(100);
-
+  pinMode(BUZZER_PIN, OUTPUT);
   machine = new WMMSystem();
 
   Task *servoTask = new ServoTask(machine);

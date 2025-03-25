@@ -41,11 +41,12 @@ public class App {
                 }
             }
             controlUnit.dashboardTick();
-            try {
-                Thread.sleep(Math.round(((lastTime + period) - System.currentTimeMillis()) * 0.8));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            
+            // try {
+            //     Thread.sleep(Math.round((System.currentTimeMillis() - (lastTime + period)) * 0.8));
+            // } catch (InterruptedException e) {
+            //     e.printStackTrace();
+            // }
         }
 
         // controlUnit.destroy();
