@@ -36,7 +36,7 @@ class DashboardApp:
         self.window_label = ttk.Label(control_frame, text=f"Window Level: {self.window_level}%")
         self.window_label.grid(row=3, column=0, sticky="w")
 
-        self.window_slider = ttk.Scale(control_frame, from_=0, to=100, orient='horizontal', command=self.update_window_level)
+        self.window_slider = ttk.Scale(control_frame, from_=0, to=90, orient='horizontal', command=self.update_window_level)
         self.window_slider.set(self.window_level)
         self.window_slider.config(state='disabled')
         self.window_slider.grid(row=3, column=1, sticky="e")
