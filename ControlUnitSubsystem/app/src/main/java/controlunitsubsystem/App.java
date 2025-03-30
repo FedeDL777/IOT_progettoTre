@@ -17,17 +17,17 @@ public class App {
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
         String comPortName = SerialPortDetector.findArduinoPort();
-        final int P1 = 1000;
-        final int P2 = 500;
+        final int P1 = 5000;
+        final int P2 = 1000;
         int period = P1;
-        long lastTime;
+        //long lastTime;
         Status status = Status.NORMAL;
 
         ControlUnit controlUnit = new ControlUnitImpl("http://127.0.0.1:5000/send", comPortName);
 
         controlUnit.sendPeriod(period);
         while (true) {
-            lastTime = System.currentTimeMillis();
+            //lastTime = System.currentTimeMillis();
             status = controlUnit.updateMotorAndStatusTick(period);
             if (status == Status.NORMAL) {
                 if (period != P1) {
@@ -41,11 +41,12 @@ public class App {
                 }
             }
             controlUnit.dashboardTick();
-            
+
             // try {
-            //     Thread.sleep(Math.round((System.currentTimeMillis() - (lastTime + period)) * 0.8));
+            // Thread.sleep(Math.round((System.currentTimeMillis() - (lastTime + period)) *
+            // 0.8));
             // } catch (InterruptedException e) {
-            //     e.printStackTrace();
+            // e.printStackTrace();
             // }
         }
 
