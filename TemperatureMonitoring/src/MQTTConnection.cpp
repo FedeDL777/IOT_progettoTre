@@ -111,16 +111,15 @@ void MQTTConnection::callback(char *topic, byte *payload, unsigned int length)
             if (this->topics[i] == TOPIC_TEMP) {
                 Serial.println("Handling temperature topic");
             }
-             else if (this->topics[i] == TOPIC_PER) {
-                if (strncmp(message, "cu:", 3) == 0) {
-                    String content = String(message).substring(3);
-                    if (content.length() > 0 && content.toInt() > 0) {
-                        this->samplingTime = content.toInt();
+            else if (this->topics[i] == TOPIC_PER) {
+                if (String(message).toInt() > 0) {
+                        this->samplingTime = String(message).toInt();
                         Serial.println("Sampling period changed to: " + String(this->samplingTime));
-                    } else {
-                        Serial.println("Invalid sampling period received: " + content);
-                    }
                 }
+                    else {
+                        Serial.println("Invalid sampling period received: " + String(message));
+                    }
+                
             }
         }
     }
