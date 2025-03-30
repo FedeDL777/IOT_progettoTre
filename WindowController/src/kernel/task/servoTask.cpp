@@ -1,7 +1,8 @@
 #include "servoTask.h"
 
 #define CHANGE_MODE_TIMEOUT 250
-
+#define MIN_ANGLE 0
+#define MAX_ANGLE 90
 ServoTask::ServoTask(WMMSystem *Machine) : machine(Machine)
 {
     Serial.println("ST");
@@ -92,17 +93,10 @@ void ServoTask::checkMsg()
         Msg *msg = MsgService.receiveMsg();
         if (msg != NULL)
         {
-            // Attiva il buzzer brevemente per segnalare il messaggio ricevuto
-
-
-            Serial.println("Message received");
 
             String content = msg->getContent();
             content.trim();          // Remove spaces and newlines
             content.replace("\"", "");  // Remove extra quotes
-        
-            Serial.println("Cleaned message: " + content);
-        
             // Split the string using ',' as a separator
             int firstComma = content.indexOf(',');
             int secondComma = content.indexOf(',', firstComma + 1);
@@ -116,18 +110,25 @@ void ServoTask::checkMsg()
                     tone(BUZZER_PIN, 40*10);
                     delay(200);
                     noTone(BUZZER_PIN);
-                    Serial.println("Parsed message: Angle=" + String(apertureInt) + " Temperature=" + String(temperature));
-    
-                    if (apertureInt >= 0 && apertureInt <= 90)
+                    if (apertureInt >= MIN_ANGLE && apertureInt <= MAX_ANGLE)
                     {
     
                         tone(BUZZER_PIN, 90*10);
                         delay(200);
                         noTone(BUZZER_PIN);
                         delay(50);
-                        Serial.println("Valid angle received, updating system...");
                         this->currentDegree = apertureInt;
                     }
+                    else if (apertureInt < MIN_ANGLE)
+                    {
+                        this->currentDegree = MIN_ANGLE;
+                    }
+                    else if (apertureInt > MAX_ANGLE)
+                    {
+                        this->currentDegree = MAX_ANGLE;
+                    }
+
+                    
     
                     this->machine->setTemperature((int)temperature); // Converti double in int
     
