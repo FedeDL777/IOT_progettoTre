@@ -128,7 +128,7 @@ class DashboardApp:
     def reset_alarm(self):
         self.alarm = False
         self.dashState = "UNDEFINED"
-        self.state_label.config(text=f"State: {self.state}")
+        self.state_label.config(text=f"State: NORMAL")
         self.alarm_button.config(state='disabled')
 
     def mainloop(self):
