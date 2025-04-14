@@ -14,6 +14,9 @@ class DashboardApp:
         self.alarm = False
         self.manual = False
         self.dashState = "NORMAL"
+        self.avg_temp = sum(self.temperatures) / len(self.temperatures)
+        self.max_temp = max(self.temperatures)
+        self.min_temp = min(self.temperatures)
 
         # Creazione finestra principale
         self.root = tk.Tk()
@@ -29,6 +32,18 @@ class DashboardApp:
         self.temp_display = tk.Text(control_frame, height=2, width=50)
         self.temp_display.grid(row=1, column=0, columnspan=2)
         self.temp_display.insert(tk.END, ', '.join(f"{t:.2f}" for t in self.temperatures))
+
+        self.stats_frame = ttk.LabelFrame(control_frame, text="Statistics")
+        self.stats_frame.grid(row=2, column=0, columnspan=2, sticky="ew", pady=5)
+        
+        self.avg_label = ttk.Label(self.stats_frame, text=f"Average Temp: {self.avg_temp:.2f}°C")
+        self.avg_label.grid(row=0, column=0, padx=5, pady=2, sticky="w")
+        
+        self.max_label = ttk.Label(self.stats_frame, text=f"Max Temp: {self.max_temp:.2f}°C")
+        self.max_label.grid(row=0, column=1, padx=5, pady=2, sticky="w")
+        
+        self.min_label = ttk.Label(self.stats_frame, text=f"Min Temp: {self.min_temp:.2f}°C")
+        self.min_label.grid(row=1, column=0, padx=5, pady=2, sticky="w")
 
         self.state_label = ttk.Label(control_frame, text=f"State: {self.state}")
         self.state_label.grid(row=2, column=0, sticky="w")
@@ -48,28 +63,36 @@ class DashboardApp:
         self.alarm_button.grid(row=4, column=1, sticky="e")
         self.alarm_button.config(state='disabled')
 
-        # FRAME: Grafico con Matplotlib
         self.graph_frame = ttk.Frame(self.root)
         self.graph_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Configurazione del grafico Matplotlib
         self.fig, self.ax = plt.subplots(figsize=(5, 3))
         self.ax.set_title("Temperature Trend")
         self.ax.set_xlabel("Time")
         self.ax.set_ylabel("Temperature (°C)")
         self.line, = self.ax.plot(self.temperatures, marker="o", linestyle="-", color="b")
 
-        # Embedding Matplotlib in Tkinter
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def calculate_temperature_stats(self):
+        """Calcola le statistiche di temperatura (media, massima, minima)."""
+        self.avg_temp = sum(self.temperatures) / len(self.temperatures)
+        self.max_temp = max(self.temperatures)
+        self.min_temp = min(self.temperatures)
+        
+        self.avg_label.config(text=f"Average Temp: {self.avg_temp:.2f}°C")
+        self.max_label.config(text=f"Max Temp: {self.max_temp:.2f}°C")
+        self.min_label.config(text=f"Min Temp: {self.min_temp:.2f}°C")
 
     def update_temperature(self, temperature):
         """Aggiunge una nuova temperatura e aggiorna GUI e grafico."""
         self.temperatures.append(temperature)
         if len(self.temperatures) > self.N:
             self.temperatures.pop(0)
-        self.root.after(0, self.refresh_display)  # Aggiorna GUI
-        self.root.after(0, self.update_plot)  # Aggiorna grafico
+        self.calculate_temperature_stats()
+        self.root.after(0, self.refresh_display)
+        self.root.after(0, self.update_plot)
 
     def update_plot(self):
         """Aggiorna il grafico delle temperature."""

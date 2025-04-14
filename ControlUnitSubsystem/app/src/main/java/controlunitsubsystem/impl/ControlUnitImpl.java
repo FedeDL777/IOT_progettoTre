@@ -22,7 +22,7 @@ public class ControlUnitImpl implements ControlUnit {
     CommChannel serialLine;
     MQTTTemperatureReceiver temperatureReceiver;
     MQTTPeriodSender periodSender;
-    boolean increasing = true; // Flag to indicate if the temperature is increasing or decreasing
+    boolean increasing = true; // Flag to indicate if the temperature is increasing or decreasing in debug mode
     long tooHotStartTime = 0; // Timestamp when the system enters TOO_HOT state
 
     final float T1 = 23;
