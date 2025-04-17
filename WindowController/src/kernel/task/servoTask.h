@@ -23,8 +23,7 @@ private:
     {
         NORMAL,
         PROBLEM,
-        MANUAL,
-        MANUAL_DASHBOARD
+        MANUAL
     };
     int currentState;
 

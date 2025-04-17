@@ -137,11 +137,10 @@ void ServoTask::checkMsg()
                         setState(NORMAL);
                         machine->setNormal();
                     }
-                } else {
-                    Serial.println("Invalid state character");
                 }
-            } else {
-                Serial.println("Invalid message format");
+                else if(stateStr == "P" && currentState != PROBLEM) {
+                    currentState = PROBLEM;
+                }
             }
 
             delete msg;
