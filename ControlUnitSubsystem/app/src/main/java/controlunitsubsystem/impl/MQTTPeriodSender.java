@@ -9,9 +9,9 @@ public class MQTTPeriodSender {
     private final String topic = "IOT-Progetto-03-per";
 
     /**
-     * Inizializza e connette il sender MQTT.
-     *
-     * @throws MqttException se si verifica un errore nella connessione MQTT
+     * Initialize and connects MQTT receiver.
+     * 
+     * @throws MqttException if occurs an error in the MQTT's connection
      */
     public MQTTPeriodSender() throws MqttException {
         String clientId = "JavaMqttPublisher-" + System.currentTimeMillis();
@@ -29,7 +29,7 @@ public class MQTTPeriodSender {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) {
-                // Non utilizzato per un publisher
+                // Non utilizzato in questo contesto
             }
 
             @Override
@@ -44,10 +44,10 @@ public class MQTTPeriodSender {
     }
 
     /**
-     * Invia un valore di periodo come intero al topic MQTT.
+     * Sends a period value as an integer.
      * 
-     * @param period il valore del periodo da inviare
-     * @throws MqttException se si verifica un errore nell'invio del messaggio
+     * @param period the value to be sent
+     * @throws MqttException if occurs an error in sending the message
      */
     public void sendPeriod(int period) throws MqttException {
         if (client != null && client.isConnected()) {
@@ -62,7 +62,7 @@ public class MQTTPeriodSender {
     }
 
     /**
-     * Chiude la connessione MQTT.
+     * Closes MQTT's connection.
      */
     public void disconnect() {
         try {

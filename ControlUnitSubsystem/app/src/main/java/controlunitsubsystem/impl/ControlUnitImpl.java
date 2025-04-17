@@ -3,7 +3,6 @@ package controlunitsubsystem.impl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import controlunitsubsystem.api.CommChannel;
@@ -15,7 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class ControlUnitImpl implements ControlUnit {
 
     Map<String, String> lastResponse = new HashMap<>();
-    float lastTemperature = 0;
+    float lastTemperature = 15;
     Status status = Status.NORMAL;
     Status dashboardStatus = Status.NORMAL;
     int motorAngle = 0;
@@ -23,6 +22,8 @@ public class ControlUnitImpl implements ControlUnit {
     CommChannel serialLine;
     MQTTTemperatureReceiver temperatureReceiver;
     MQTTPeriodSender periodSender;
+    boolean increasing = true; // Flag to indicate if the temperature is increasing or decreasing in debug mode
+    long tooHotStartTime = 0; // Timestamp when the system enters TOO_HOT state
 
     final float T1 = 23;
     final float T2 = 26;
@@ -57,6 +58,7 @@ public class ControlUnitImpl implements ControlUnit {
         return this.dashboard.postReceive(lastTemperature, status.name(), motorAngle);
     }
 
+    
     @Override
     public void updateTemperature(int timeout) {
         Float newTemperature = temperatureReceiver.receiveTemperature(timeout);
@@ -67,6 +69,22 @@ public class ControlUnitImpl implements ControlUnit {
         
     }
 
+    
+    private float generateTemperature() {
+    
+        if (increasing) {
+            lastTemperature += 0.5f; // Aumento graduale
+            if (lastTemperature >= 30.0f) {
+                increasing = false;  // Quando arriva a 30°C, cambia stato
+            }
+        } else {
+            lastTemperature = 20.0f; // Reset improvviso a 20°C
+            increasing = true; // Ricomincia a salire
+        }
+    
+        return lastTemperature;
+    }
+    
     @Override
     public void sendPeriod(int period) {
         try {
@@ -84,6 +102,7 @@ public class ControlUnitImpl implements ControlUnit {
     @Override
     public void dashboardTick() {
         try {
+            System.err.println("dashboardTick: " + status.name() + " motorAngle: " + motorAngle);
             String response = dashboardMessage();
             ObjectMapper mapper = new ObjectMapper();
             try {
@@ -98,6 +117,7 @@ public class ControlUnitImpl implements ControlUnit {
                     dashboardStatus = Status.NORMAL;
                 }
                 motorAngle = Integer.parseInt(lastResponse.get("window_level"));// always the angle to send to the motor
+                System.out.println("sending motorAngle: " + motorAngle);
                 sendMsgToMotor();
 
                 System.out.println("status: " + dashboardStatus.name() + " motorAngle: " + motorAngle);
@@ -119,19 +139,32 @@ public class ControlUnitImpl implements ControlUnit {
 
     @Override
     public Status updateMotorAndStatusTick(int timeout) {
-        updateTemperature(timeout);
-        if (status != Status.ALARM || status != Status.DASHBOARD) {
-            if (lastTemperature < T1) {
-                status = Status.NORMAL;
-                motorAngle = 0;
-            } else if (lastTemperature < T2) {
-                status = Status.HOT;
-                motorAngle = Math.round(((lastTemperature - T1) / (T2 - T1)) * 90);
-            } else {
-                status = Status.TOO_HOT;
-                motorAngle = 90;
+        System.err.println("updateMotorAndStatusTick: " + status.name() + " motorAngle: " + motorAngle);
+    updateTemperature(timeout);
+
+    if (status != Status.ALARM && status != Status.DASHBOARD) {
+        if (lastTemperature < T1) {
+            status = Status.NORMAL;
+            motorAngle = 0;
+            tooHotStartTime = 0; // Resetta il timer
+        } else if (lastTemperature < T2) {
+            status = Status.HOT;
+            motorAngle = Math.round(((lastTemperature - T1) / (T2 - T1)) * 90);
+            tooHotStartTime = 0; // Resetta il timer
+        } else {
+            if (status != Status.TOO_HOT) {
+                tooHotStartTime = System.currentTimeMillis(); // Salva il tempo di ingresso
+            }
+            status = Status.TOO_HOT;
+            motorAngle = 90;
+
+            // Se è passato più di 1 secondo in TOO_HOT, cambia in ALARM
+            if (System.currentTimeMillis() - tooHotStartTime >= 1000) {
+                status = Status.ALARM;
             }
         }
-        return status;
+    }
+
+    return status;
     }
 }

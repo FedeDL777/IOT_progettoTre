@@ -27,4 +27,4 @@ class HttpServer:
 
     def run(self):
         # Avvia il server Flask
-        self.app.run(debug=True, port=5000, use_reloader=False)  # use_reloader=False per evitare l'esecuzione doppia in modalità debug
+        self.app.run(debug=True, port=5000, use_reloader=False)

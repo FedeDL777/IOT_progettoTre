@@ -8,7 +8,7 @@ SensorTemp::SensorTemp(int pin)
 
 float SensorTemp::getTemperature()
 {
-  Serial.println(analogRead(pin));
+
   int valoreAnalogico = analogRead(pin); // Legge il valore ADC (0-4095)
     
   // Converti la lettura in tensione

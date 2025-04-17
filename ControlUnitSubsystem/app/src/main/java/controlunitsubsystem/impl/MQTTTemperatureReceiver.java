@@ -13,9 +13,9 @@ public class MQTTTemperatureReceiver {
     private final BlockingQueue<Float> temperatureQueue = new LinkedBlockingQueue<>();
 
     /**
-     * Inizializza e connette il ricevitore MQTT.
+     * Initialize and connects MQTT receiver.
      * 
-     * @throws MqttException se si verifica un errore nella connessione MQTT
+     * @throws MqttException if occurs an error in the MQTT's connection
      */
     public MQTTTemperatureReceiver() throws MqttException {
         String clientId = "JavaMqttClient-" + System.currentTimeMillis();
@@ -59,11 +59,11 @@ public class MQTTTemperatureReceiver {
     }
 
     /**
-     * Riceve un valore di temperatura dal topic MQTT.
-     * Attende fino a quando non arriva una temperatura o fino al timeout.
+     * Receives a temperature value from the MQTT's topic.
+     * Wait for the new temperature or timeout.
      * 
-     * @param timeoutMillis millisecondi di attesa prima di ritornare null
-     * @return il valore di temperatura o null se si è verificato un timeout
+     * @param timeoutMillis milliseconds to wait before it returns null
+     * @return temperature value or null if timeout occurs
      */
     public Float receiveTemperature(int timeoutMillis) {
         try {
@@ -75,7 +75,7 @@ public class MQTTTemperatureReceiver {
     }
 
     /**
-     * Chiude la connessione MQTT.
+     * Close the MQTT connection.
      */
     public void disconnect() {
         try {
